@@ -1,8 +1,8 @@
 AllCops:
   Exclude:
-    - 'bin'
-    - 'sorbet'
-    - '.idea'
+    - 'bin/*'
+    - 'sorbet/*'
+    - '.idea/*'
 Layout/LineLength:
   Max: 120
 

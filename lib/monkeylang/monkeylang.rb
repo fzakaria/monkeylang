@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 # typed: strong
-require "monkeylang/version"
+require 'monkeylang/version'
 
 module Monkeylang
   class Error < StandardError; end

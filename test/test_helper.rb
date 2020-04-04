@@ -1,5 +1,7 @@
-# typed: strict
-$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
-require "monkeylang"
+# frozen_string_literal: true
 
-require "minitest/autorun"
+# typed: strict
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
+require 'monkeylang'
+
+require 'minitest/autorun'

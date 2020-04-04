@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 # A sample Guardfile
 # More info at https://github.com/guard/guard#readme
 
 ## Uncomment and set this to only include directories you want to watch
- directories %w(lib test) \
-  .select{|d| Dir.exist?(d) ? d : UI.warning("Directory #{d} does not exist")}
+directories %w[lib test] \
+  .select { |d| Dir.exist?(d) ? d : UI.warning("Directory #{d} does not exist") }
 
 ## Note: if you are using the `directories` clause above and you are not
 ## watching the project directory ('.'), then you will want to move
@@ -16,7 +18,7 @@
 # and, you'll have to watch "config/Guardfile" instead of "Guardfile"
 
 guard :rubocop do
-  watch(%r{.+\.rb$})
+  watch(/.+\.rb$/)
   watch(%r{(?:.+/)?\.rubocop(?:_todo)?\.yml$}) { |m| File.dirname(m[0]) }
 end
 

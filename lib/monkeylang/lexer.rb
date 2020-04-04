@@ -12,7 +12,7 @@ module MonkeyLang
     extend T::Sig
 
     sig { params(contents: String).returns(T::Array[Token]) }
-    def self.parse(_contents)
+    def self.parse(contents)
       []
     end
   end

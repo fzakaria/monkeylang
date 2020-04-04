@@ -3942,6 +3942,11 @@ module MonitorMixin
   def self.extend_object(obj); end
 end
 
+class MonkeyLang::Lexer
+  extend ::T::Private::Methods::MethodHooks
+  extend ::T::Private::Methods::SingletonMethodHooks
+end
+
 module Mutex_m
   VERSION = ::T.let(nil, ::T.untyped)
 end

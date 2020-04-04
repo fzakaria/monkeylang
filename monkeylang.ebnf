@@ -1,0 +1,39 @@
+(* 
+
+	EBNF (Extended Backus Naur Form) for our Monkey language 
+
+- Expressions that may be omitted or repeated can be represented through curly braces { ... }:
+- An option can be represented through squared brackets [ ... ]. That is, everything that is set within the square brackets may be present just once, or not at all:
+- The comma represents a concatenation A,B == A+B
+- Semicolon (;) is the terminator for a rule
+
+*)
+
+program = { statement }
+
+statement = "let", white space, identifier, "=", expression, ";"
+
+float = [ "-" ], digit, { digit }, [.] ;
+
+floag = integer, ".", { digit }, digit excluding zero;
+
+integer = "0" | [ "-" ], natural number ;
+
+string = '"' , { all characters - '"' }, '"' ;
+
+identifier = alphabetic character, { alphabetic character | digit | "_" }, [ "?" ] ;
+
+alphabetic character = "A" | "B" | "C" | "D" | "E" | "F" | "G"
+                     | "H" | "I" | "J" | "K" | "L" | "M" | "N"
+                     | "O" | "P" | "Q" | "R" | "S" | "T" | "U"
+                     | "V" | "W" | "X" | "Y" | "Z" ;
+
+natural number = digit excluding zero, { digit } ;
+
+digit excluding zero = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+digit = "0" | digit excluding zero ;
+
+white space = ? white space characters ? ;
+
+all characters = ? all visible characters ? ;

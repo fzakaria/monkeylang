@@ -1,3 +1,4 @@
+# typed: strong
 require "monkeylang/version"
 
 module Monkeylang

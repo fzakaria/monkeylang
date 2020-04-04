@@ -1,3 +1,4 @@
+# typed: strong
 module MonkeyLang
 
 	# The lexer for the Monkey language.

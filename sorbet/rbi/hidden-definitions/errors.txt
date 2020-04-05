@@ -2929,7 +2929,7 @@
 # wrong constant name transform_keys!
 # wrong constant name transform_values!
 # wrong constant name update
-# wrong constant name from_trusted_xml
+# wrong constant name try_convert
 # wrong constant name <Class:Backend>
 # wrong constant name <Class:Gettext>
 # wrong constant name <Class:Locale>
@@ -5472,6 +5472,7 @@
 # wrong constant name _load
 # wrong constant name clone
 # wrong constant name __init__
+# uninitialized constant Slop::FloatOption::DEFAULT_CONFIG
 # uninitialized constant Socket::APPEND
 # uninitialized constant Socket::BINARY
 # uninitialized constant Socket::CREAT

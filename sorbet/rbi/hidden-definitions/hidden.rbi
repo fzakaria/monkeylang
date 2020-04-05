@@ -4533,7 +4533,7 @@ class Hash
 end
 
 class Hash
-  def self.from_trusted_xml(xml); end
+  def self.try_convert(_); end
 end
 
 module I18n
@@ -5616,6 +5616,11 @@ module MonitorMixin
   def self.extend_object(obj); end
 end
 
+class MonkeyLang::CLI
+  extend ::T::Private::Methods::MethodHooks
+  extend ::T::Private::Methods::SingletonMethodHooks
+end
+
 class MonkeyLang::Lexer
   extend ::T::Private::Methods::MethodHooks
   extend ::T::Private::Methods::SingletonMethodHooks
@@ -5627,6 +5632,8 @@ class MonkeyLang::LexerError
 end
 
 class MonkeyLang::Token
+  extend ::T::Private::Methods::MethodHooks
+  extend ::T::Private::Methods::SingletonMethodHooks
   def self.inherited(s); end
 end
 
@@ -5677,13 +5684,9 @@ end
 class Net::HTTPAlreadyReported
 end
 
-class Net::HTTPClientError
-end
+Net::HTTPClientError::EXCEPTION_TYPE = Net::HTTPServerException
 
-Net::HTTPClientErrorCode::EXCEPTION_TYPE = Net::HTTPServerException
-
-class Net::HTTPClientError
-end
+Net::HTTPClientErrorCode = Net::HTTPClientError
 
 Net::HTTPClientException = Net::HTTPServerException
 
@@ -10442,6 +10445,26 @@ end
 
 module Singleton
   def self.__init__(klass); end
+end
+
+module Slop
+  VERSION = ::T.let(nil, ::T.untyped)
+end
+
+Slop::BooleanOption = Slop::BoolOption
+
+class Slop::FloatOption
+  FLOAT_STRING_REGEXP = ::T.let(nil, ::T.untyped)
+end
+
+Slop::IntOption = Slop::IntegerOption
+
+class Slop::Option
+  DEFAULT_CONFIG = ::T.let(nil, ::T.untyped)
+end
+
+class Slop::Options
+  DEFAULT_CONFIG = ::T.let(nil, ::T.untyped)
 end
 
 class Socket

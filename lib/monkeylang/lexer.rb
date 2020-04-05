@@ -70,46 +70,8 @@ module MonkeyLang
         return Token.new(literal: '', type: Token::Type::EOF, line_number: @position, column: 0)
       end
 
-      case @current_char
-      when '='
-        return Token.new(literal: @current_char, type: Token::Type::Assign, line_number: @line_number, column: @column)
-      when ','
-        return Token.new(literal: @current_char, type: Token::Type::Comma,
-                         line_number: @line_number, column: @column)
-      when ';'
-        return Token.new(literal: @current_char, type: Token::Type::SemiColon,
-                         line_number: @line_number, column: @column)
-      when '('
-        return Token.new(literal: @current_char, type: Token::Type::LeftParanthesis,
-                         line_number: @line_number, column: @column)
-      when ')'
-        return Token.new(literal: @current_char, type: Token::Type::RightParanthesis,
-                         line_number: @line_number, column: @column)
-      when '+'
-        return Token.new(literal: @current_char, type: Token::Type::Plus, line_number: @line_number, column: @column)
-      when '-'
-        return Token.new(literal: @current_char, type: Token::Type::Minus, line_number: @line_number, column: @column)
-      when '!'
-        return Token.new(literal: @current_char, type: Token::Type::Bang, line_number: @line_number, column: @column)
-      when '/'
-        return Token.new(literal: @current_char, type: Token::Type::ForwardSlash,
-                         line_number: @line_number, column: @column)
-      when '*'
-        return Token.new(literal: @current_char, type: Token::Type::Asterisk,
-                         line_number: @line_number, column: @column)
-      when '<'
-        return Token.new(literal: @current_char, type: Token::Type::LessThan,
-                         line_number: @line_number, column: @column)
-      when '>'
-        return Token.new(literal: @current_char, type: Token::Type::GreaterThan,
-                         line_number: @line_number, column: @column)
-      when '{'
-        return Token.new(literal: @current_char, type: Token::Type::LeftCurlyBrace,
-                         line_number: @line_number, column: @column)
-      when '}'
-        return Token.new(literal: @current_char, type: Token::Type::RightCurlyBrace,
-                         line_number: @line_number, column: @column)
-      end
+      type = Token::Type.try_deserialize(@current_char)
+      return Token.new(literal: @current_char, type: type, line_number: @line_number, column: @column) if type.present?
 
       if letter?(@current_char)
         start = @position

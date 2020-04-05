@@ -2,6 +2,7 @@
 
 # typed: strict
 require_relative 'monkeylang/version'
+require_relative 'monkeylang/lexer'
 require 'slop'
 require 'sorbet-runtime'
 
@@ -18,6 +19,23 @@ module MonkeyLang
           puts MonkeyLang::VERSION
           exit
         end
+      end
+
+      # make sure sloptions aren't consumed by ARGF
+      ARGV.replace opts.arguments
+
+      if ARGV.empty?
+        puts 'You must provide at least one file.'
+        exit 1
+      end
+
+      ARGV.each do |file|
+        contents = File.read(file)
+        lexer = Lexer.new(contents)
+        tokens = lexer.each_token.to_a
+
+        # print the tokens if we have enabled it
+        puts tokens if opts.lexer?
       end
     end
   end

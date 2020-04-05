@@ -15,7 +15,7 @@ module MonkeyLang
     class Type < T::Enum
       enums do
         Illegal = new('ILLEGAL')
-        EOF = new
+        EOF = new('EOF')
 
         # Identifiers & literals
         Identifier = new('IDENTIFIER') # ex. add, foobar, x, y
@@ -41,13 +41,18 @@ module MonkeyLang
         RightCurlyBrace = new('}')
 
         # Keywords
-        Function = new('FUNCTION')
-        Let = new('LET')
-        True = new('TRUE')
-        False = new('FALSE')
-        If = new('IF')
-        Else = new('ELSE')
-        Return = new('RETURN')
+        Function = new('fn')
+        Let = new('let')
+        True = new('true')
+        False = new('false')
+        If = new('if')
+        Else = new('else')
+        Return = new('return')
+      end
+
+      sig { returns(String) }
+      def to_s
+        serialize
       end
     end
 
@@ -58,7 +63,11 @@ module MonkeyLang
 
     sig { returns(String) }
     def to_s
-      "[#{line_number}:#{column}] #{literal}, #{type}"
+      if type.to_s != literal
+        "[#{line_number}:#{column}] #{type} #{literal}"
+      else
+        "[#{line_number}:#{column}] #{literal}"
+      end
     end
   end
 end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# typed: false
+# typed: true
 require 'sorbet-runtime'
 require 'active_support/core_ext/object'
 
@@ -40,6 +40,23 @@ module MonkeyLang
       @column = T.let(0, Integer) # the specific column we are at
     end
 
+    sig do
+      params(
+        blk: T.nilable(T.proc.params(arg0: Token).void)
+      ).returns(T::Enumerator[Token])
+    end
+    def each_token(&blk)
+      return enum_for(:each_token) unless block_given?
+
+      loop do
+        token = next_token
+        blk.call(token)
+        break if token.type == Token::Type::EOF
+      end
+
+      enum_for(:each_token)
+    end
+
     # Returns the next token.
     # Will return EOF continuously when called once the end of the file has been reached.
     sig { returns(Token) }
@@ -55,42 +72,42 @@ module MonkeyLang
 
       case @current_char
       when '='
-        return Token.new(literal: @current_char, type: Token::Type::ASSIGN, line_number: @line_number, column: @column)
+        return Token.new(literal: @current_char, type: Token::Type::Assign, line_number: @line_number, column: @column)
       when ','
-        return Token.new(literal: @current_char, type: Token::Type::COMMA,
+        return Token.new(literal: @current_char, type: Token::Type::Comma,
                          line_number: @line_number, column: @column)
       when ';'
-        return Token.new(literal: @current_char, type: Token::Type::SEMICOLON,
+        return Token.new(literal: @current_char, type: Token::Type::SemiColon,
                          line_number: @line_number, column: @column)
       when '('
-        return Token.new(literal: @current_char, type: Token::Type::LEFT_PARENTHESES,
+        return Token.new(literal: @current_char, type: Token::Type::LeftParanthesis,
                          line_number: @line_number, column: @column)
       when ')'
-        return Token.new(literal: @current_char, type: Token::Type::RIGHT_PARENTHESES,
+        return Token.new(literal: @current_char, type: Token::Type::RightParanthesis,
                          line_number: @line_number, column: @column)
       when '+'
-        return Token.new(literal: @current_char, type: Token::Type::PLUS, line_number: @line_number, column: @column)
+        return Token.new(literal: @current_char, type: Token::Type::Plus, line_number: @line_number, column: @column)
       when '-'
-        return Token.new(literal: @current_char, type: Token::Type::MINUS, line_number: @line_number, column: @column)
+        return Token.new(literal: @current_char, type: Token::Type::Minus, line_number: @line_number, column: @column)
       when '!'
-        return Token.new(literal: @current_char, type: Token::Type::BANG, line_number: @line_number, column: @column)
+        return Token.new(literal: @current_char, type: Token::Type::Bang, line_number: @line_number, column: @column)
       when '/'
-        return Token.new(literal: @current_char, type: Token::Type::FORWARD_SLASH,
+        return Token.new(literal: @current_char, type: Token::Type::ForwardSlash,
                          line_number: @line_number, column: @column)
       when '*'
-        return Token.new(literal: @current_char, type: Token::Type::ASTERISK,
+        return Token.new(literal: @current_char, type: Token::Type::Asterisk,
                          line_number: @line_number, column: @column)
       when '<'
-        return Token.new(literal: @current_char, type: Token::Type::LESS_THAN,
+        return Token.new(literal: @current_char, type: Token::Type::LessThan,
                          line_number: @line_number, column: @column)
       when '>'
-        return Token.new(literal: @current_char, type: Token::Type::GREATER_THAN,
+        return Token.new(literal: @current_char, type: Token::Type::GreaterThan,
                          line_number: @line_number, column: @column)
       when '{'
-        return Token.new(literal: @current_char, type: Token::Type::LEFT_BRACE,
+        return Token.new(literal: @current_char, type: Token::Type::LeftCurlyBrace,
                          line_number: @line_number, column: @column)
       when '}'
-        return Token.new(literal: @current_char, type: Token::Type::RIGHT_BRACE,
+        return Token.new(literal: @current_char, type: Token::Type::RightCurlyBrace,
                          line_number: @line_number, column: @column)
       end
 
@@ -98,8 +115,8 @@ module MonkeyLang
         start = @position
         # consume the next letters if they make up an identifier
         read_character while letter?(peek_next) || digit?(peek_next) || (peek_next == '_') || (peek_next == '?')
-        literal = @input[start..@position]
-        type = KEYWORDS.fetch(literal, Token::Type::IDENTIFIER)
+        literal = T.must(@input[start..@position])
+        type = KEYWORDS.fetch(literal, Token::Type::Identifier)
         return Token.new(literal: literal, type: type, line_number: @line_number, column: @column)
       end
 
@@ -108,11 +125,11 @@ module MonkeyLang
         start = @position
         # while the next letters are digits; consume it to make up an integer
         read_character while digit?(peek_next)
-        literal = @input[start..@position]
-        return Token.new(literal: literal, type: Token::Type::INTEGER, line_number: @line_number, column: @column)
+        literal = T.must(@input[start..@position])
+        return Token.new(literal: literal, type: Token::Type::Integer, line_number: @line_number, column: @column)
       end
 
-      Token.new(literal: @current_char, type: Token::Type::ILLEGAL, line_number: @position, column: @column)
+      Token.new(literal: @current_char, type: Token::Type::Illegal, line_number: @position, column: @column)
     end
 
     sig { void }
@@ -144,17 +161,17 @@ module MonkeyLang
       read_character while whitespace?(@current_char) && @position < @input.size
     end
 
-    sig { params(char: String).returns(T::Boolean) }
+    sig { params(char: T.nilable(String)).returns(T::Boolean) }
     private def letter?(char)
       (char =~ /[[:alpha:]]/).present?
     end
 
-    sig { params(char: String).returns(T::Boolean) }
+    sig { params(char: T.nilable(String)).returns(T::Boolean) }
     private def digit?(char)
       (char =~ /[[:digit:]]/).present?
     end
 
-    sig { params(char: String).returns(T::Boolean) }
+    sig { params(char: T.nilable(String)).returns(T::Boolean) }
     private def whitespace?(char)
       (char =~ /[[:space:]]/).present?
     end

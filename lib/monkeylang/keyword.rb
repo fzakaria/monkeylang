@@ -6,12 +6,12 @@ require 'sorbet-runtime'
 require_relative 'token'
 module MonkeyLang
   KEYWORDS = T.let({
-    'fn' => Token::Type::FUNCTION,
-    'let' => Token::Type::LET,
-    'true' => Token::Type::TRUE,
-    'false' => Token::Type::FALSE,
-    'if' => Token::Type::IF,
-    'else' => Token::Type::ELSE,
-    'return' => Token::Type::RETURN
-  }.freeze, T::Hash[String, String])
+    'fn' => Token::Type::Function,
+    'let' => Token::Type::Let,
+    'true' => Token::Type::True,
+    'false' => Token::Type::False,
+    'if' => Token::Type::If,
+    'else' => Token::Type::Else,
+    'return' => Token::Type::Return
+  }.freeze, T::Hash[String, Token::Type])
 end

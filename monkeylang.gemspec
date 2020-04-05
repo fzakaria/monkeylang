@@ -4,7 +4,7 @@ require_relative 'lib/monkeylang/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'monkeylang'
-  spec.version       = Monkeylang::VERSION
+  spec.version       = MonkeyLang::VERSION
   spec.authors       = ['Farid Zakaria']
   spec.email         = ['farid.m.zakaria@gmail.com']
 
@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'activesupport'
+  spec.add_dependency 'slop'
   spec.add_dependency 'sorbet-runtime'
 
   spec.add_development_dependency 'guard'

@@ -1,12 +1,12 @@
-# typed: false
+# typed: true
 # frozen_string_literal: true
 
 require 'test_helper'
 require 'monkeylang/lexer'
 
-class LexterTest < Minitest::Test
-  include MonkeyLang::Token::Type
+Type = MonkeyLang::Token::Type
 
+class LexterTest < Minitest::Test
   def test_next_token_simple
     input = <<~MONKEYLANG
       let five = 5;
@@ -20,53 +20,53 @@ class LexterTest < Minitest::Test
     MONKEYLANG
 
     expected_tokens = [
-      token('let', LET),
-      token('five', IDENTIFIER),
-      token('=', ASSIGN),
-      token('5', INTEGER),
-      token(';', SEMICOLON),
-      token('let', LET),
-      token('ten', IDENTIFIER),
-      token('=', ASSIGN),
-      token('10', INTEGER),
-      token(';', SEMICOLON),
-      token('let', LET),
-      token('add', IDENTIFIER),
-      token('=', ASSIGN),
-      token('fn', FUNCTION),
-      token('(', LEFT_PARENTHESES),
-      token('x', IDENTIFIER),
-      token(',', COMMA),
-      token('y', IDENTIFIER),
-      token(')', RIGHT_PARENTHESES),
-      token('{', LEFT_BRACE),
-      token('x', IDENTIFIER),
-      token('+', PLUS),
-      token('y', IDENTIFIER),
-      token(';', SEMICOLON),
-      token('}', RIGHT_BRACE),
-      token('let', LET),
-      token('result', IDENTIFIER),
-      token('=', ASSIGN),
-      token('add', IDENTIFIER),
-      token('(', LEFT_PARENTHESES),
-      token('five', IDENTIFIER),
-      token(',', COMMA),
-      token('ten', IDENTIFIER),
-      token(')', RIGHT_PARENTHESES),
-      token(';', SEMICOLON),
-      token('!', BANG),
-      token('-', MINUS),
-      token('/', FORWARD_SLASH),
-      token('*', ASTERISK),
-      token('5', INTEGER),
-      token('5', INTEGER),
-      token('<', LESS_THAN),
-      token('10', INTEGER),
-      token('>', GREATER_THAN),
-      token('5', INTEGER),
-      token(';', SEMICOLON),
-      token('', EOF)
+      token('let', Type::Let),
+      token('five', Type::Identifier),
+      token('=', Type::Assign),
+      token('5', Type::Integer),
+      token(';', Type::SemiColon),
+      token('let', Type::Let),
+      token('ten', Type::Identifier),
+      token('=', Type::Assign),
+      token('10', Type::Integer),
+      token(';', Type::SemiColon),
+      token('let', Type::Let),
+      token('add', Type::Identifier),
+      token('=', Type::Assign),
+      token('fn', Type::Function),
+      token('(', Type::LeftParanthesis),
+      token('x', Type::Identifier),
+      token(',', Type::Comma),
+      token('y', Type::Identifier),
+      token(')', Type::RightParanthesis),
+      token('{', Type::LeftCurlyBrace),
+      token('x', Type::Identifier),
+      token('+', Type::Plus),
+      token('y', Type::Identifier),
+      token(';', Type::SemiColon),
+      token('}', Type::RightCurlyBrace),
+      token('let', Type::Let),
+      token('result', Type::Identifier),
+      token('=', Type::Assign),
+      token('add', Type::Identifier),
+      token('(', Type::LeftParanthesis),
+      token('five', Type::Identifier),
+      token(',', Type::Comma),
+      token('ten', Type::Identifier),
+      token(')', Type::RightParanthesis),
+      token(';', Type::SemiColon),
+      token('!', Type::Bang),
+      token('-', Type::Minus),
+      token('/', Type::ForwardSlash),
+      token('*', Type::Asterisk),
+      token('5', Type::Integer),
+      token('5', Type::Integer),
+      token('<', Type::LessThan),
+      token('10', Type::Integer),
+      token('>', Type::GreaterThan),
+      token('5', Type::Integer),
+      token(';', Type::SemiColon),
+      token('', Type::EOF)
     ]
 
     lexer = MonkeyLang::Lexer.new(input)

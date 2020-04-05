@@ -263,6 +263,9 @@ end
 module Lumberjack::TaggedLogging::ClassMethods
   def new(logger); end
 end
+module ActiveSupport::TaggedLogging
+  include Lumberjack::TaggedLogging
+end
 class Lumberjack::Template
   def call(entry); end
   def compile(template); end

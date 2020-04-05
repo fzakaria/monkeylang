@@ -15,7 +15,6 @@ module RuboCop::Version
   def self.version(debug = nil); end
 end
 class String
-  def blank?; end
 end
 module RuboCop::PathUtil
   def absolute?(path); end
@@ -429,6 +428,7 @@ module RuboCop::AST::CollectionNode
   def each_with_object(*args, &block); end
   def empty?(*args, &block); end
   def entries(*args, &block); end
+  def extract_options!(*args, &block); end
   def fetch(*args, &block); end
   def fill(*args, &block); end
   def filter!(*args, &block); end
@@ -504,8 +504,12 @@ module RuboCop::AST::CollectionNode
   def take(*args, &block); end
   def take_while(*args, &block); end
   def to_ary(*args, &block); end
+  def to_default_s(*args, &block); end
+  def to_formatted_s(*args, &block); end
   def to_h(*args, &block); end
+  def to_sentence(*args, &block); end
   def to_set(*args, &block); end
+  def to_xml(*args, &block); end
   def transpose(*args, &block); end
   def union(*args, &block); end
   def uniq!(*args, &block); end

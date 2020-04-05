@@ -3,7 +3,7 @@
 # typed: strong
 require 'monkeylang/version'
 
-module Monkeylang
+module MonkeyLang
   class Error < StandardError; end
   # Your code goes here...
 end

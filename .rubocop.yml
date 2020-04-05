@@ -5,7 +5,16 @@ AllCops:
     - '.idea/*'
 Layout/LineLength:
   Max: 120
-
+Metrics/MethodLength:
+  Max: 100
+Style/AccessModifierDeclarations:
+  EnforcedStyle: inline
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Metrics/PerceivedComplexity:
+  Enabled: false
+Metrics/AbcSize:
+  Enabled: false
 Lint/RaiseException:
   Enabled: true
 Lint/StructNewOverride:

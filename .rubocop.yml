@@ -9,6 +9,8 @@ Metrics/MethodLength:
   Max: 100
 Style/AccessModifierDeclarations:
   EnforcedStyle: inline
+Metrics/ClassLength:
+  Enabled: false
 Metrics/CyclomaticComplexity:
   Enabled: false
 Metrics/PerceivedComplexity:

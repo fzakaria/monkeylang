@@ -6,6 +6,8 @@ require 'sorbet-runtime'
 module MonkeyLang
   # The various tokens that are possible in the Monkey language
   class Token < T::Struct
+    extend T::Sig
+
     const :literal, String
     const :type, String
     const :line_number, Integer
@@ -27,15 +29,21 @@ module MonkeyLang
       # Operators
       ASSIGN = '='
       PLUS = '+'
+      MINUS = '-'
+      BANG = '!'
+      ASTERISK = '*'
+      FORWARD_SLASH = '/'
+      LESS_THAN = '<'
+      GREATER_THAN = '>'
 
       # Delimiters
       COMMA = ','
       SEMICOLON = ';'
 
-      LPAREN = '('
-      RPAREN = ')'
-      LBRACE = '{'
-      RBRACE = '}'
+      LEFT_PARENTHESES = '('
+      RIGHT_PARENTHESES = ')'
+      LEFT_BRACE = '{'
+      RIGHT_BRACE = '}'
 
       # Keywords
       FUNCTION = 'FUNCTION'

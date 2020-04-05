@@ -44,33 +44,54 @@ module MonkeyLang
     # Will return EOF continuously when called once the end of the file has been reached.
     sig { returns(Token) }
     def next_token
+      read_character
+
+      skip_whitespace
+
       # if we are at the end of the file simply; return EOF.
       if @position >= @input.size
         return Token.new(literal: '', type: Token::Type::EOF, line_number: @position, column: 0)
       end
 
-      read_character
-
-      skip_whitespace
-
       case @current_char
       when '='
         return Token.new(literal: @current_char, type: Token::Type::ASSIGN, line_number: @line_number, column: @column)
+      when ','
+        return Token.new(literal: @current_char, type: Token::Type::COMMA,
+                         line_number: @line_number, column: @column)
       when ';'
         return Token.new(literal: @current_char, type: Token::Type::SEMICOLON,
                          line_number: @line_number, column: @column)
       when '('
-        return Token.new(literal: @current_char, type: Token::Type::LPAREN, line_number: @line_number, column: @column)
+        return Token.new(literal: @current_char, type: Token::Type::LEFT_PARENTHESES,
+                         line_number: @line_number, column: @column)
       when ')'
-        return Token.new(literal: @current_char, type: Token::Type::RPAREN, line_number: @line_number, column: @column)
-      when ','
-        return Token.new(literal: @current_char, type: Token::Type::COMMA, line_number: @line_number, column: @column)
+        return Token.new(literal: @current_char, type: Token::Type::RIGHT_PARENTHESES,
+                         line_number: @line_number, column: @column)
       when '+'
         return Token.new(literal: @current_char, type: Token::Type::PLUS, line_number: @line_number, column: @column)
+      when '-'
+        return Token.new(literal: @current_char, type: Token::Type::MINUS, line_number: @line_number, column: @column)
+      when '!'
+        return Token.new(literal: @current_char, type: Token::Type::BANG, line_number: @line_number, column: @column)
+      when '/'
+        return Token.new(literal: @current_char, type: Token::Type::FORWARD_SLASH,
+                         line_number: @line_number, column: @column)
+      when '*'
+        return Token.new(literal: @current_char, type: Token::Type::ASTERISK,
+                         line_number: @line_number, column: @column)
+      when '<'
+        return Token.new(literal: @current_char, type: Token::Type::LESS_THAN,
+                         line_number: @line_number, column: @column)
+      when '>'
+        return Token.new(literal: @current_char, type: Token::Type::GREATER_THAN,
+                         line_number: @line_number, column: @column)
       when '{'
-        return Token.new(literal: @current_char, type: Token::Type::LBRACE, line_number: @line_number, column: @column)
+        return Token.new(literal: @current_char, type: Token::Type::LEFT_BRACE,
+                         line_number: @line_number, column: @column)
       when '}'
-        return Token.new(literal: @current_char, type: Token::Type::RBRACE, line_number: @line_number, column: @column)
+        return Token.new(literal: @current_char, type: Token::Type::RIGHT_BRACE,
+                         line_number: @line_number, column: @column)
       end
 
       if letter?(@current_char)
@@ -98,7 +119,11 @@ module MonkeyLang
     private def read_character
       # read the current character
       @position = @read_position
+
+      return false if @position >= @input.size
+
       @current_char = T.must(@input[@read_position])
+
       @read_position += 1
       @column += 1
       return unless @current_char == '\n'
@@ -116,7 +141,7 @@ module MonkeyLang
 
     sig { void }
     private def skip_whitespace
-      read_character while whitespace?(@current_char)
+      read_character while whitespace?(@current_char) && @position < @input.size
     end
 
     sig { params(char: String).returns(T::Boolean) }

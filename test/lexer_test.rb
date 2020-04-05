@@ -5,7 +5,9 @@ require 'test_helper'
 require 'monkeylang/lexer'
 
 class LexterTest < Minitest::Test
-  def test_next_token
+  include MonkeyLang::Token::Type
+
+  def test_next_token_simple
     input = <<~MONKEYLANG
       let five = 5;
       let ten = 10;
@@ -16,8 +18,40 @@ class LexterTest < Minitest::Test
     MONKEYLANG
 
     expected_tokens = [
-      MonkeyLang::Token.new('let', MonkeyLang::Token::Type::LET, 0, 0),
-      MonkeyLang::Token.new('five', MonkeyLang::Token::Type::IDENTIFIER, 0, 0)
+      token('let', LET),
+      token('five', IDENTIFIER),
+      token('=', ASSIGN),
+      token('5', INTEGER),
+      token(';', SEMICOLON),
+      token('let', LET),
+      token('ten', IDENTIFIER),
+      token('=', ASSIGN),
+      token('10', INTEGER),
+      token(';', SEMICOLON),
+      token('let', LET),
+      token('add', IDENTIFIER),
+      token('=', ASSIGN),
+      token('fn', FUNCTION),
+      token('(', LPAREN),
+      token('x', IDENTIFIER),
+      token(',', COMMA),
+      token('y', IDENTIFIER),
+      token(')', RPAREN),
+      token('{', LBRACE),
+      token('x', IDENTIFIER),
+      token('+', PLUS),
+      token('y', IDENTIFIER),
+      token(';', SEMICOLON),
+      token('}', RBRACE),
+      token('let', LET),
+      token('result', IDENTIFIER),
+      token('=', ASSIGN),
+      token('add', IDENTIFIER),
+      token('(', LPAREN),
+      token('five', IDENTIFIER),
+      token(',', COMMA),
+      token('ten', IDENTIFIER),
+      token(')', RPAREN)
     ]
 
     lexer = MonkeyLang::Lexer.new(input)
@@ -26,5 +60,9 @@ class LexterTest < Minitest::Test
       assert_equal expected_token.literal, token.literal
       assert_equal expected_token.type, token.type
     end
+  end
+
+  private def token(literal, type)
+    MonkeyLang::Token.new(literal: literal, type: type, line_number: 0, column: 0)
   end
 end

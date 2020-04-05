@@ -11,6 +11,11 @@ module MonkeyLang
     const :line_number, Integer
     const :column, Integer
 
+    sig { returns(String) }
+    def to_s
+      "[#{line_number}:#{column}] #{literal}, #{type}"
+    end
+
     module Type
       ILLEGAL = 'ILLEGAL'
       EOF = 'EOF'
@@ -35,6 +40,11 @@ module MonkeyLang
       # Keywords
       FUNCTION = 'FUNCTION'
       LET = 'LET'
+      TRUE = 'TRUE'
+      FALSE = 'FALSE'
+      IF = 'IF'
+      ELSE = 'ELSE'
+      RETURN = 'RETURN'
     end
   end
 end

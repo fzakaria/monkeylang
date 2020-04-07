@@ -3,6 +3,5 @@
 
 # typed: strong
 module ::Anonymous_Delegator_3; end
-module ::Monkeylang::VERSION; end
 module T::Private::Methods::MethodHooks; end
 module T::Private::Methods::SingletonMethodHooks; end

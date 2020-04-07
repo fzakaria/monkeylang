@@ -97,8 +97,23 @@ class LexterTest < Minitest::Test
     end
   end
 
+  def test_identifier_simple
+    input = <<~MONKEYLANG.chomp
+      abc
+    MONKEYLANG
+    expected_tokens = [
+      token('abc', Type::Identifier)
+    ]
+    lexer = MonkeyLang::Lexer.new(input)
+    expected_tokens.each do |expected_token|
+      token = lexer.next_token
+      assert_equal expected_token.type, token.type
+      assert_equal expected_token.literal, token.literal
+    end
+  end
+
   def test_string_simple
-    input = <<~MONKEYLANG
+    input = <<~MONKEYLANG.chomp
       # multiple strings
       "hello world" "hi"
       # multiline strings

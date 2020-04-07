@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
-# typed: strict
+# typed: false
 require_relative 'monkeylang/version'
 require_relative 'monkeylang/lexer'
+
+require 'readline'
 require 'slop'
 require 'sorbet-runtime'
 
@@ -21,22 +23,30 @@ module MonkeyLang
         end
       end
 
-      # make sure sloptions aren't consumed by ARGF
+      # make sure slop options aren't consumed by ARGF
       ARGV.replace opts.arguments
 
+      # if no argument is supplied; start an interactive REPL
       if ARGV.empty?
-        puts 'You must provide at least one file.'
-        exit 1
+        while (buf = Readline.readline('> ', true))
+          break if buf == 'exit'
+
+          lexer(buf, print_tokens: opts.lexer?)
+        end
       end
 
       ARGV.each do |file|
         contents = File.read(file)
-        lexer = Lexer.new(contents)
-        tokens = lexer.each_token.to_a
-
-        # print the tokens if we have enabled it
-        puts tokens if opts.lexer?
+        lexer(contents, print_tokens: opts.lexer?)
       end
+    end
+
+    def self.lexer(contents, print_tokens: false)
+      lexer = Lexer.new(contents)
+      tokens = lexer.each_token.to_a
+
+      # print the tokens if we have enabled it
+      puts(tokens.reject { |token| token.type == TokenType::EOF }) if print_tokens
     end
   end
 end

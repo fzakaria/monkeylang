@@ -4533,7 +4533,7 @@ class Hash
 end
 
 class Hash
-  def self.try_convert(_); end
+  def self.from_trusted_xml(xml); end
 end
 
 module I18n
@@ -5626,11 +5626,6 @@ class MonkeyLang::Lexer
   extend ::T::Private::Methods::SingletonMethodHooks
 end
 
-class MonkeyLang::LexerError
-  extend ::T::Private::Methods::MethodHooks
-  extend ::T::Private::Methods::SingletonMethodHooks
-end
-
 class MonkeyLang::Token
   extend ::T::Private::Methods::MethodHooks
   extend ::T::Private::Methods::SingletonMethodHooks
@@ -5777,13 +5772,9 @@ Net::HTTPResponceReceiver = Net::HTTPResponse
 
 Net::HTTPRetriableCode = Net::HTTPRedirection
 
-class Net::HTTPServerError
-end
+Net::HTTPServerError::EXCEPTION_TYPE = Net::HTTPFatalError
 
-Net::HTTPServerErrorCode::EXCEPTION_TYPE = Net::HTTPFatalError
-
-class Net::HTTPServerError
-end
+Net::HTTPServerErrorCode = Net::HTTPServerError
 
 class Net::HTTP
 end
@@ -5795,13 +5786,7 @@ Net::HTTPSession::ProxyMod = Net::HTTP::ProxyDelta
 class Net::HTTP
 end
 
-class Net::HTTPSuccess
-end
-
-Net::HTTPSuccessCode::EXCEPTION_TYPE = Net::HTTPError
-
-class Net::HTTPSuccess
-end
+Net::HTTPSuccessCode = Net::HTTPSuccess
 
 class Net::HTTPURITooLong
   HAS_BODY = ::T.let(nil, ::T.untyped)
@@ -7628,6 +7613,91 @@ module RbConfig
   def self.fire_update!(key, val, mkconf=T.unsafe(nil), conf=T.unsafe(nil)); end
 
   def self.ruby(); end
+end
+
+module Readline
+  FILENAME_COMPLETION_PROC = ::T.let(nil, ::T.untyped)
+  HISTORY = ::T.let(nil, ::T.untyped)
+  USERNAME_COMPLETION_PROC = ::T.let(nil, ::T.untyped)
+  VERSION = ::T.let(nil, ::T.untyped)
+end
+
+module Readline
+  def self.basic_quote_characters(); end
+
+  def self.basic_quote_characters=(basic_quote_characters); end
+
+  def self.basic_word_break_characters(); end
+
+  def self.basic_word_break_characters=(basic_word_break_characters); end
+
+  def self.completer_quote_characters(); end
+
+  def self.completer_quote_characters=(completer_quote_characters); end
+
+  def self.completer_word_break_characters(); end
+
+  def self.completer_word_break_characters=(completer_word_break_characters); end
+
+  def self.completion_append_character(); end
+
+  def self.completion_append_character=(completion_append_character); end
+
+  def self.completion_case_fold(); end
+
+  def self.completion_case_fold=(completion_case_fold); end
+
+  def self.completion_proc(); end
+
+  def self.completion_proc=(completion_proc); end
+
+  def self.completion_quote_character(); end
+
+  def self.delete_text(*_); end
+
+  def self.emacs_editing_mode(); end
+
+  def self.emacs_editing_mode?(); end
+
+  def self.filename_quote_characters(); end
+
+  def self.filename_quote_characters=(filename_quote_characters); end
+
+  def self.get_screen_size(); end
+
+  def self.input=(input); end
+
+  def self.insert_text(_); end
+
+  def self.line_buffer(); end
+
+  def self.output=(output); end
+
+  def self.point(); end
+
+  def self.point=(point); end
+
+  def self.pre_input_hook(); end
+
+  def self.pre_input_hook=(pre_input_hook); end
+
+  def self.quoting_detection_proc(); end
+
+  def self.quoting_detection_proc=(quoting_detection_proc); end
+
+  def self.redisplay(); end
+
+  def self.refresh_line(); end
+
+  def self.set_screen_size(_, _1); end
+
+  def self.special_prefixes(); end
+
+  def self.special_prefixes=(special_prefixes); end
+
+  def self.vi_editing_mode(); end
+
+  def self.vi_editing_mode?(); end
 end
 
 class Resolv::DNS

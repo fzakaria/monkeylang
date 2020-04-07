@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# typed: true
+# typed: strict
 require 'sorbet-runtime'
 
 # The main module for MonkeyLang
@@ -62,7 +62,7 @@ module MonkeyLang
       Or = new('or')
     end
 
-    sig { returns(String) }
+    sig { returns(::String) }
     def to_s
       serialize
     end

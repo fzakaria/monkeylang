@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# typed: true
+# typed: strict
 require 'sorbet-runtime'
 require 'active_support/core_ext/object'
 
@@ -46,7 +46,7 @@ module MonkeyLang
       skip_whitespace
 
       # if there is no more input; return EOF
-      return token(Type::EOF) if end?
+      return token(TokenType::EOF) if end?
 
       current_char = read_character
       next_char = peek_character
@@ -66,17 +66,17 @@ module MonkeyLang
 
       # check if it is a known type with two characters
       # we handle these first before the global single case match
-      type = Type.try_deserialize(current_char + next_char)
+      type = TokenType.try_deserialize(current_char + next_char)
       if type.present?
         read_character
         return token(type, current_char + next_char)
       end
 
       # check if it is a known type
-      type = Type.try_deserialize(current_char)
+      type = TokenType.try_deserialize(current_char)
       return token(type, current_char) if type.present?
 
-      token(Type::Illegal, current_char)
+      token(TokenType::Illegal, current_char)
     end
 
     sig { params(type: TokenType, literal: String).returns(Token) }
@@ -98,19 +98,19 @@ module MonkeyLang
     end
 
     # peek at the upcoming value
-    # returns \0 if we are at the end of the input
+    # returns nothing if we are at the end of the input
     sig { returns(String) }
     private def peek_character
-      return '\0' if end?
+      return '' if end?
 
       T.must(@input[@position])
     end
 
     # Peeks at one-after the next value
-    # returns \0 if we are at the end of the input
+    # returns nothing if we are at the end of the input
     sig { returns(String) }
     private def peek_next_character
-      return '\0' if (@position + 1) >= @input.size
+      return '' if (@position + 1) >= @input.size
 
       T.must(@input[@position + 1])
     end
@@ -122,7 +122,7 @@ module MonkeyLang
       # we do not one because we want to omit the quotes
       start = @position
       loop do
-        return token(Type::EOF) if end?
+        return token(TokenType::Illegal) if end?
 
         # if we have a \", then it is an escaped quote not the end of the string
         if peek_character == '\\' && peek_next_character == '"'
@@ -145,7 +145,7 @@ module MonkeyLang
       read_character
 
       literal = T.must(@input[start...@position - 1])
-      token(Type::String, literal)
+      token(TokenType::String, literal)
     end
 
     # Parse the next set of characters as if they were a number
@@ -165,7 +165,7 @@ module MonkeyLang
       end
 
       literal = T.must(@input[start...@position])
-      token(Type::Number, literal)
+      token(TokenType::Number, literal)
     end
 
     # Parse the next set of characters as if they were an identifier or keyword
@@ -207,7 +207,7 @@ module MonkeyLang
 
     sig { params(char: String).returns(T::Boolean) }
     private def digit?(char)
-      (char =~ /[[:digit:]]/).present?
+      (char =~ /\d/).present?
     end
 
     sig { params(char: String).returns(T::Boolean) }

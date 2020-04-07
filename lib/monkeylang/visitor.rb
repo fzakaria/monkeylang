@@ -12,18 +12,16 @@ module MonkeyLang
     extend T::Generic
     interface!
 
-    ResultType = type_member
-
-    sig { abstract.params(expr: BinaryExpression).returns(ResultType) }
+    sig { abstract.params(expr: BinaryExpression).void }
     def visit_binary_expression(expr); end
 
-    sig { abstract.params(expr: UnaryExpression).returns(ResultType) }
+    sig { abstract.params(expr: UnaryExpression).void }
     def visit_unary_expression(expr); end
 
-    sig { abstract.params(expr: GroupingExpression).returns(ResultType) }
+    sig { abstract.params(expr: GroupingExpression).void }
     def visit_group_expression(expr); end
 
-    sig { abstract.params(expr: LiteralExpression).returns(ResultType) }
+    sig { abstract.params(expr: LiteralExpression).void }
     def visit_literal_expression(expr); end
   end
 end

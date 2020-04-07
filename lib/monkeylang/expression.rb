@@ -14,21 +14,31 @@ module MonkeyLang
     extend T::Generic
     abstract!
 
-    sig { abstract.params(visitor: Visitor[T.untyped]).returns(T.untyped) }
+    sig { abstract.type_parameters(:T).params(visitor: Visitor[T.type_parameter(:T)]).void }
     def accept(visitor); end
   end
 
   # Expression for binary operations
   class BinaryExpression < Expression
-    include T::Props
-    include T::Props::Serializable
-    include T::Props::Constructor
+    extend T::Sig
 
-    const :left, Expression
-    const :right, Expression
-    const :operator, Token
+    sig { returns(Expression) }
+    attr_reader :left
 
-    sig { override.params(visitor: Visitor[T.untyped]).returns(T.untyped) }
+    sig { returns(Expression) }
+    attr_reader :right
+
+    sig { returns(Token) }
+    attr_reader :operator
+
+    sig { params(left: Expression, operator: Token, right: Expression).void }
+    def initialize(left, operator, right)
+      @left = left
+      @operator = operator
+      @right = right
+    end
+
+    sig { override.type_parameters(:T).params(visitor: Visitor[T.type_parameter(:T)]).void }
     def accept(visitor)
       visitor.visit_binary_expression(self)
     end
@@ -36,14 +46,21 @@ module MonkeyLang
 
   # Expression for unary operations
   class UnaryExpression < Expression
-    include T::Props
-    include T::Props::Serializable
-    include T::Props::Constructor
+    extend T::Sig
 
-    const :right, Expression
-    const :operator, Token
+    sig { returns(Expression) }
+    attr_reader :right
 
-    sig { override.params(visitor: Visitor[T.untyped]).returns(T.untyped) }
+    sig { returns(Token) }
+    attr_reader :operator
+
+    sig { params(operator: Token, right: Expression).void }
+    def initialize(operator, right)
+      @operator = operator
+      @right = right
+    end
+
+    sig { override.type_parameters(:T).params(visitor: Visitor[T.type_parameter(:T)]).void }
     def accept(visitor)
       visitor.visit_unary_expression(self)
     end
@@ -51,13 +68,17 @@ module MonkeyLang
 
   # Expression for grouping
   class GroupingExpression < Expression
-    include T::Props
-    include T::Props::Serializable
-    include T::Props::Constructor
+    extend T::Sig
 
-    const :expression, Expression
+    sig { returns(Expression) }
+    attr_reader :expression
 
-    sig { override.params(visitor: Visitor[T.untyped]).returns(T.untyped) }
+    sig { params(expression: Expression).void }
+    def initialize(expression)
+      @expression = expression
+    end
+
+    sig { override.type_parameters(:T).params(visitor: Visitor[T.type_parameter(:T)]).void }
     def accept(visitor)
       visitor.visit_group_expression(self)
     end
@@ -65,13 +86,17 @@ module MonkeyLang
 
   # Expression for literal
   class LiteralExpression < Expression
-    include T::Props
-    include T::Props::Serializable
-    include T::Props::Constructor
+    extend T::Sig
 
-    const :literal, String
+    sig { returns(String) }
+    attr_reader :literal
 
-    sig { override.params(visitor: Visitor[T.untyped]).returns(T.untyped) }
+    sig { params(literal: String).void }
+    def initialize(literal)
+      @literal = literal
+    end
+
+    sig { override.type_parameters(:T).params(visitor: Visitor[T.type_parameter(:T)]).void }
     def accept(visitor)
       visitor.visit_literal_expression(self)
     end

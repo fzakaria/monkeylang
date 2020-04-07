@@ -41,9 +41,27 @@ module MonkeyLang
     # equality -> comparison ( ( "!=" | "==" ) comparison )* ;
     sig { returns(Expression) }
     private def equality
-      expr = comparison
+      left_associate_operators([TokenType::BangEqual, TokenType::EqualEqual])
+    end
 
-      while match(TokenType::BangEqual, TokenType::EqualEqual)
+    # comparison -> addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
+    sig { returns(Expression) }
+    private def comparison
+      left_associate_operators([TokenType::GreaterThan, TokenType::GreaterThanOrEqual,
+                                TokenType::LessThan, TokenType::LessThanOrEqual])
+    end
+
+    # addition   -> multiplication ( ( "-" | "+" ) multiplication )* ;
+    sig { returns(Expression) }
+    private def addition
+      left_associate_operators([TokenType::Minus, TokenType::Plus])
+    end
+
+    sig { params(types: T::Array[TokenType]).returns(Expression) }
+    private def left_associate_operators(types)
+      expr = addition
+
+      while match(types)
         operator = previous
         right = comparison
         expr = BinaryExpression.new(expr, operator, right)
@@ -52,14 +70,8 @@ module MonkeyLang
       expr
     end
 
-    # comparison -> addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
-    sig { returns(Expression) }
-    private def comparison
-      equality
-    end
-
-    sig { params(types: TokenType).returns(T::Boolean) }
-    private def match(*types)
+    sig { params(types: T::Array[TokenType]).returns(T::Boolean) }
+    private def match(types)
       found = types.any? { |type| check(type) }
       advance if found
       found

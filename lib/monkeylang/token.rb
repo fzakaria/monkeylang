@@ -7,16 +7,14 @@ require_relative 'token_type'
 # The main module for MonkeyLang
 module MonkeyLang
   extend T::Sig
-
   # The various tokens that are possible in the Monkey language
   class Token < T::Struct
     extend T::Sig
 
     const :literal, String
-    const :type, Type
+    const :type, TokenType
 
     # Debugging information
-    const :line, String
     const :line_number, Integer
     const :column, Integer
 

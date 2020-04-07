@@ -6,7 +6,7 @@ require 'sorbet-runtime'
 # The main module for MonkeyLang
 module MonkeyLang
   # An enumeration of all Token types in MonkeyLang
-  class Type < T::Enum
+  class TokenType < T::Enum
     extend T::Sig
 
     enums do
@@ -15,17 +15,26 @@ module MonkeyLang
 
       # Identifiers & literals
       Identifier = new('IDENTIFIER') # ex. add, foobar, x, y
-      Integer = new('INTEGER') # 123456
+      Number = new('NUMBER') # 123456 or 123.456
+      String = new('STRING') # "hello world"
 
       # Operators
-      Assign = new('=')
+      Equal = new('=')
+      EqualEqual = new('==')
       Plus = new('+')
       Minus = new('-')
       Bang = new('!')
+      BangEqual = new('!=')
       Asterisk = new('*')
       ForwardSlash = new('/')
       LessThan = new('<')
+      LessThanOrEqual = new('<=')
       GreaterThan = new('>')
+      GreaterThanOrEqual = new('>=')
+      Ampersand = new('&')
+      AmpersandAmpersand = new('&&')
+      Pipe = new('|')
+      PipePipe = new('||')
 
       # Delimiters
       Comma = new(',')
@@ -44,6 +53,13 @@ module MonkeyLang
       If = new('if')
       Else = new('else')
       Return = new('return')
+      Super = new('super')
+      While = new('while')
+      For = new('for')
+      Nil = new('nil')
+      Class = new('class')
+      And = new('and')
+      Or = new('or')
     end
 
     sig { returns(String) }

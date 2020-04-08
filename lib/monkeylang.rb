@@ -26,7 +26,7 @@ module MonkeyLang
         end
       end
 
-      puts "Starting Monkey interpreter...."
+      puts 'Starting Monkey interpreter....'
       # make sure slop options aren't consumed by ARGF
       ARGV.replace opts.arguments
 

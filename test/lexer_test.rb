@@ -126,7 +126,7 @@ class LexterTest < Minitest::Test
       token('hello world', Type::String),
       token('hi', Type::String),
       token("hello there\nwho are you", Type::String),
-      token('', Type::EOF)
+      token('', Type::Illegal)
     ]
     lexer = MonkeyLang::Lexer.new(input)
     expected_tokens.each do |expected_token|
@@ -135,6 +135,27 @@ class LexterTest < Minitest::Test
       assert_equal expected_token.literal, token.literal
     end
   end
+
+  def test_grouping_simple
+    input = <<~MONKEYLANG.chomp
+      (1 + 2)
+    MONKEYLANG
+    expected_tokens = [
+        token('(', Type::LeftParanthesis),
+        token('1', Type::Number),
+        token('+', Type::Plus),
+        token('2', Type::Number),
+        token(')', Type::RightParanthesis),
+        token('', Type::EOF)
+    ]
+    lexer = MonkeyLang::Lexer.new(input)
+    expected_tokens.each do |expected_token|
+      token = lexer.next_token
+      assert_equal expected_token.type, token.type
+      assert_equal expected_token.literal, token.literal
+    end
+  end
+
 
   private def token(literal, type)
     MonkeyLang::Token.new(literal: literal, type: type, line_number: 0, column: 0)

@@ -66,10 +66,12 @@ module MonkeyLang
 
       # check if it is a known type with two characters
       # we handle these first before the global single case match
-      type = TokenType.try_deserialize(current_char + next_char)
-      if type.present?
-        read_character
-        return token(type, current_char + next_char)
+      unless end?
+        type = TokenType.try_deserialize(current_char + next_char)
+        if type.present?
+          read_character
+          return token(type, current_char + next_char)
+        end
       end
 
       # check if it is a known type

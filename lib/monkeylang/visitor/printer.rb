@@ -35,7 +35,9 @@ module MonkeyLang
 
       sig { override.params(expr: LiteralExpression).void }
       def visit_literal_expression(expr)
-        @io.print expr.literal
+        literal = expr.literal
+        literal = 'nil' if literal.nil?
+        @io.print literal
       end
 
       sig { params(name: String, exprs: Expression).void }

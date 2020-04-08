@@ -21,6 +21,13 @@ module MonkeyLang
       @values[name] = value
     end
 
+    sig { params(name: String, value: T.untyped).void }
+    def assign(name, value)
+      raise "Undefined variable '#{name}'." unless @values.key? name
+
+      @values[name] = value
+    end
+
     sig { params(name: String).returns(T.untyped) }
     def get(name)
       raise "Undefined variable '#{name}'." unless @values.key? name

@@ -62,7 +62,7 @@ module MonkeyLang
 
       return let_expression if match([TokenType::Let])
 
-      equality
+      assignment
     end
 
     sig { returns(LetExpression) }
@@ -81,6 +81,30 @@ module MonkeyLang
     private def print_expression
       expr = expression
       PrintExpression.new expr
+    end
+
+    sig { returns(Expression) }
+    private def assignment
+      expr = equality
+
+      if match([TokenType::Equal])
+        equals = previous
+        # recursive call here makes it right-associative
+        value = assignment
+        # The trick is that right before we create the assignment
+        # expression node, we look at the left-hand side expression and figure
+        # out what kind of assignment target it is.
+        # We convert the r-value expression node into an l-value representation.
+        #
+        # at this point, the original expr must be an identifier (VariableExpression)
+        if expr.is_a? VariableExpression
+          identifier = expr.identifier
+          return AssignmentExpression.new identifier, value
+        end
+        error(equals, 'Invalid asssignment target.')
+      end
+
+      expr
     end
 
     # equality -> comparison ( ( "!=" | "==" ) comparison )* ;

@@ -51,6 +51,12 @@ module MonkeyLang
         paranethesis(expr.identifier)
       end
 
+      sig { override.params(expr: AssignmentExpression).void }
+      def visit_assignment_expression(expr)
+        paranethesis(expr.identifier.to_s, T.must(expr.value)) if expr.value.present?
+        paranethesis(expr.identifier.to_s) if expr.value.nil?
+      end
+
       sig { override.params(expr: PrintExpression).void }
       def visit_print_expression(expr)
         paranethesis('print', expr.expression)

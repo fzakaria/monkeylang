@@ -57,6 +57,11 @@ module MonkeyLang
         @io.print expr.identifier
       end
 
+      sig { override.params(expr: AssignmentExpression).void }
+      def visit_assignment_expression(expr)
+        T.must(expr.value).accept(self) if expr.value.present?
+      end
+
       sig { override.params(expr: PrintExpression).void }
       def visit_print_expression(expr)
         # enter the expression

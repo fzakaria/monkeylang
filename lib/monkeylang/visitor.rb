@@ -30,6 +30,9 @@ module MonkeyLang
     sig { abstract.params(expr: VariableExpression).void }
     def visit_variable_expression(expr); end
 
+    sig { abstract.params(expr: AssignmentExpression).void }
+    def visit_assignment_expression(expr); end
+
     sig { abstract.params(expr: PrintExpression).void }
     def visit_print_expression(expr); end
   end

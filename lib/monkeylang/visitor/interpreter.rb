@@ -98,6 +98,15 @@ module MonkeyLang
         @result = environment.get expr.identifier
       end
 
+      sig { override.params(expr: AssignmentExpression).void }
+      def visit_assignment_expression(expr)
+        value = nil
+        value = evaluate(T.must(expr.value)) if expr.value.present?
+        environment.assign(expr.identifier, value)
+
+        @result = value
+      end
+
       sig { override.params(expr: PrintExpression).void }
       def visit_print_expression(expr)
         puts evaluate(expr.expression)

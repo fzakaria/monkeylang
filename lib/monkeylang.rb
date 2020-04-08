@@ -5,6 +5,7 @@ require_relative 'monkeylang/version'
 require_relative 'monkeylang/lexer'
 require_relative 'monkeylang/parser'
 require_relative 'monkeylang/visitor/printer'
+require_relative 'monkeylang/visitor/interpreter'
 
 require 'readline'
 require 'slop'
@@ -36,7 +37,10 @@ module MonkeyLang
           break if buf == 'exit'
 
           tokens = lexer(buf, print_tokens: opts.lexer?)
-          parse(tokens, print_ast: opts.ast?)
+          expr = parse(tokens, print_ast: opts.ast?)
+
+          interpreter = Visitor::Interpreter.new
+          puts "#{interpreter.interpret(expr)}"
         end
       end
 

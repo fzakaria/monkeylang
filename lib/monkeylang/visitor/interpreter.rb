@@ -21,6 +21,16 @@ module MonkeyLang
         @result = T.let(nil, T.untyped)
       end
 
+      sig { params(expr: Expression).returns(T.untyped) }
+      def interpret(expr)
+        begin
+          evaluate(expr)
+        rescue => e
+          puts "Error: #{e.message}"
+          nil
+        end
+      end
+
       sig { override.params(expr: BinaryExpression).void }
       def visit_binary_expression(expr)
         left = evaluate(expr.left)

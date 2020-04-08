@@ -83,7 +83,7 @@ module MonkeyLang
 
     sig { params(type: TokenType, literal: String).returns(Token) }
     private def token(type, literal = '')
-      Token.new(literal: literal, type: type, line_number: @position, column: @column)
+      Token.new(literal: literal, type: type, line_number: @line_number, column: @column)
     end
 
     # read the next character and advance our read pointer

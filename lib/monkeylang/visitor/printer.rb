@@ -40,6 +40,17 @@ module MonkeyLang
         @io.print literal
       end
 
+      sig { override.params(expr: LetExpression).void }
+      def visit_let_expression(expr)
+        paranethesis("let #{expr.identifier}", T.must(expr.value)) if expr.value.present?
+        paranethesis("let #{expr.identifier}") if expr.value.nil?
+      end
+
+      sig { override.params(expr: VariableExpression).void }
+      def visit_variable_expression(expr)
+        paranethesis(expr.identifier)
+      end
+
       sig { override.params(expr: PrintExpression).void }
       def visit_print_expression(expr)
         paranethesis('print', expr.expression)

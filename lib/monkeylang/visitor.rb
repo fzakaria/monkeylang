@@ -24,6 +24,12 @@ module MonkeyLang
     sig { abstract.params(expr: LiteralExpression).void }
     def visit_literal_expression(expr); end
 
+    sig { abstract.params(expr: LetExpression).void }
+    def visit_let_expression(expr); end
+
+    sig { abstract.params(expr: VariableExpression).void }
+    def visit_variable_expression(expr); end
+
     sig { abstract.params(expr: PrintExpression).void }
     def visit_print_expression(expr); end
   end

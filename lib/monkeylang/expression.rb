@@ -104,6 +104,46 @@ module MonkeyLang
     end
   end
 
+  # Expression for let assignment
+  class LetExpression < Expression
+    extend T::Sig
+
+    sig { returns(String) }
+    attr_reader :identifier
+
+    sig { returns(T.nilable(Expression)) }
+    attr_reader :value
+
+    sig { params(identifier: String, value: T.nilable(Expression)).void }
+    def initialize(identifier, value)
+      @identifier = identifier
+      @value = value
+    end
+
+    sig { override.type_parameters(:T).params(visitor: Visitor[T.type_parameter(:T)]).void }
+    def accept(visitor)
+      visitor.visit_let_expression(self)
+    end
+  end
+
+  # Expression for variable access
+  class VariableExpression < Expression
+    extend T::Sig
+
+    sig { returns(String) }
+    attr_reader :identifier
+
+    sig { params(identifier: String).void }
+    def initialize(identifier)
+      @identifier = identifier
+    end
+
+    sig { override.type_parameters(:T).params(visitor: Visitor[T.type_parameter(:T)]).void }
+    def accept(visitor)
+      visitor.visit_variable_expression(self)
+    end
+  end
+
   # Expression for printing
   # TODO: Move this to a function in standard library later
   class PrintExpression < Expression

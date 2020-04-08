@@ -40,7 +40,12 @@ module MonkeyLang
 
           tokens = lexer(buf, print_tokens: opts.lexer?)
           exprs = parse(tokens, print_ast: opts.ast?)
-          puts interpreter.interpret(exprs).to_s
+          result = interpreter.interpret(exprs)
+          if result.nil?
+            puts '=> nil'
+          else
+            puts "=> #{result}"
+          end
         end
       end
 
@@ -61,17 +66,19 @@ module MonkeyLang
       tokens
     end
 
-    sig { params(tokens: T::Array[Token], print_ast: T::Boolean).returns(T.nilable(Expression)) }
+    sig { params(tokens: T::Array[Token], print_ast: T::Boolean).returns(T::Array[Expression]) }
     def self.parse(tokens, print_ast: false)
       parser = Parser.new(tokens)
-      expression = parser.parse
+      expressions = parser.parse
 
       string_io = StringIO.new
       printer = Visitor::Printer.new(string_io)
-      expression.accept printer if print_ast && expression.present?
+
+      expressions.each { |expression| expression.accept printer if print_ast && expression.present? }
+
       puts string_io.string unless string_io.string.blank?
 
-      expression
+      expressions
     end
   end
 end

@@ -3,6 +3,7 @@
 # typed: strict
 require 'sorbet-runtime'
 require_relative '../visitor'
+require_relative '../environment'
 
 module MonkeyLang
   module Visitor
@@ -16,9 +17,13 @@ module MonkeyLang
       sig { returns(T.nilable(Object)) }
       attr_reader :result
 
+      sig { returns(Environment) }
+      attr_reader :environment
+
       sig { void }
       def initialize
         @result = T.let(nil, T.untyped)
+        @environment = T.let(Environment.new, Environment)
       end
 
       sig { params(expressions: T::Array[Expression]).returns(T.untyped) }
@@ -79,9 +84,24 @@ module MonkeyLang
         @result = expr.literal
       end
 
+      sig { override.params(expr: LetExpression).void }
+      def visit_let_expression(expr)
+        value = nil
+        value = evaluate(T.must(expr.value)) if expr.value.present?
+        environment.define(expr.identifier, value)
+
+        @result = value
+      end
+
+      sig { override.params(expr: VariableExpression).void }
+      def visit_variable_expression(expr)
+        @result = environment.get expr.identifier
+      end
+
       sig { override.params(expr: PrintExpression).void }
       def visit_print_expression(expr)
         puts evaluate(expr.expression)
+        @result = nil
       end
 
       sig { params(expr: Expression).returns(T.untyped) }

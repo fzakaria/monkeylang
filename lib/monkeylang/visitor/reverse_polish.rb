@@ -47,6 +47,16 @@ module MonkeyLang
         @io.print expr.literal
       end
 
+      sig { override.params(expr: LetExpression).void }
+      def visit_let_expression(expr)
+        T.must(expr.value).accept(self) if expr.value.present?
+      end
+
+      sig { override.params(expr: VariableExpression).void }
+      def visit_variable_expression(expr)
+        @io.print expr.identifier
+      end
+
       sig { override.params(expr: PrintExpression).void }
       def visit_print_expression(expr)
         # enter the expression

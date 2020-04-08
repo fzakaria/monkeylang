@@ -33,17 +33,26 @@ module MonkeyLang
     sig { returns(T::Array[Expression]) }
     def parse
       expressions = []
-      until end?
-        expressions << expression
+      begin
+        until end?
+          expressions << expression
 
-        # if we are not at the end; we expect a new line or a semi colon
-        unless end?
-          raise error(peek, 'Expected at SEMI_COLON between expressions') unless match([TokenType::SemiColon])
+          # if we are not at the end; we expect a new line or a semi colon
+          unless end?
+            raise error(peek, 'Expected at SEMI_COLON between expressions') unless match([TokenType::SemiColon])
+          end
         end
+        expressions
+      rescue StandardError
+        # synchronize moves us to the next expression
+        # by munging all tokens until the semi-colon
+        # This is a friendly way to continue parsing
+        synchronize
+        # we rely here on Ruby's retry keyword to try the begin/rescue block
+        # again
+        retry unless end?
+        expressions
       end
-      expressions
-    rescue StandardError
-      []
     end
 
     # expression -> equality ;
@@ -51,7 +60,21 @@ module MonkeyLang
     private def expression
       return print_expression if match([TokenType::Print])
 
+      return let_expression if match([TokenType::Let])
+
       equality
+    end
+
+    sig { returns(LetExpression) }
+    private def let_expression
+      identifier = consume(TokenType::Identifier, 'Expected a variable name')
+
+      # We can define a variable without an equality;
+      # this is the same as defining the default value
+      value = nil
+      value = expression if match([TokenType::Equal])
+
+      LetExpression.new identifier.literal, value
     end
 
     sig { returns(PrintExpression) }
@@ -138,6 +161,7 @@ module MonkeyLang
       return LiteralExpression.new nil if match([TokenType::Nil])
       return LiteralExpression.new previous.literal if match([TokenType::String])
       return LiteralExpression.new previous.literal.to_f if match([TokenType::Number])
+      return VariableExpression.new previous.literal if match([TokenType::Identifier])
 
       if match([TokenType::LeftParanthesis])
         expr = expression
@@ -151,7 +175,7 @@ module MonkeyLang
     # This is called after an error is caught;
     # we want to read tokens until the next statement
     sig { void }
-    private def syncrhonize
+    private def synchronize
       advance
       until end?
         return if previous.type == TokenType::SemiColon

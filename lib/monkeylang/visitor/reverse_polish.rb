@@ -46,6 +46,12 @@ module MonkeyLang
       def visit_literal_expression(expr)
         @io.print expr.literal
       end
+
+      sig { override.params(expr: PrintExpression).void }
+      def visit_print_expression(expr)
+        # enter the expression
+        expr.expression.accept(self)
+      end
     end
   end
 end

@@ -21,14 +21,11 @@ module MonkeyLang
         @result = T.let(nil, T.untyped)
       end
 
-      sig { params(expr: Expression).returns(T.untyped) }
-      def interpret(expr)
-        begin
-          evaluate(expr)
-        rescue => e
-          puts "Error: #{e.message}"
-          nil
-        end
+      sig { params(expressions: T::Array[Expression]).returns(T.untyped) }
+      def interpret(expressions)
+        expressions.map { |expr| evaluate(expr) }.last
+      rescue StandardError => e
+        "Error: #{e.message}"
       end
 
       sig { override.params(expr: BinaryExpression).void }
@@ -80,6 +77,11 @@ module MonkeyLang
       sig { override.params(expr: LiteralExpression).void }
       def visit_literal_expression(expr)
         @result = expr.literal
+      end
+
+      sig { override.params(expr: PrintExpression).void }
+      def visit_print_expression(expr)
+        puts evaluate(expr.expression)
       end
 
       sig { params(expr: Expression).returns(T.untyped) }

@@ -33,14 +33,14 @@ module MonkeyLang
 
       # if no argument is supplied; start an interactive REPL
       if ARGV.empty?
+
+        interpreter = Visitor::Interpreter.new
         while (buf = Readline.readline('> ', true))
           break if buf == 'exit'
 
           tokens = lexer(buf, print_tokens: opts.lexer?)
-          expr = parse(tokens, print_ast: opts.ast?)
-
-          interpreter = Visitor::Interpreter.new
-          puts "#{interpreter.interpret(expr)}"
+          exprs = parse(tokens, print_ast: opts.ast?)
+          puts interpreter.interpret(exprs).to_s
         end
       end
 

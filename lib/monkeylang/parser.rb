@@ -30,17 +30,34 @@ module MonkeyLang
       @position = T.let(0, Integer)
     end
 
-    sig { returns(T.nilable(Expression)) }
+    sig { returns(T::Array[Expression]) }
     def parse
-      expression
+      expressions = []
+      until end?
+        expressions << expression
+
+        # if we are not at the end; we expect a new line or a semi colon
+        unless end?
+          raise error(peek, 'Expected at SEMI_COLON between expressions') unless match([TokenType::SemiColon])
+        end
+      end
+      expressions
     rescue StandardError
-      nil
+      []
     end
 
     # expression -> equality ;
     sig { returns(Expression) }
     private def expression
+      return print_expression if match([TokenType::Print])
+
       equality
+    end
+
+    sig { returns(PrintExpression) }
+    private def print_expression
+      expr = expression
+      PrintExpression.new expr
     end
 
     # equality -> comparison ( ( "!=" | "==" ) comparison )* ;

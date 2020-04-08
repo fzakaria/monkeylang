@@ -60,6 +60,8 @@ module MonkeyLang
       Class = new('class')
       And = new('and')
       Or = new('or')
+      # TODO: Remove once the standard library has been declared
+      Print = new('print')
     end
 
     sig { returns(::String) }

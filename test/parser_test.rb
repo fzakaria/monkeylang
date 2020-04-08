@@ -18,10 +18,10 @@ class ParserTest < Minitest::Test
 
     lexer = Lexer.new(input)
     parser = MonkeyLang::Parser.new(lexer.each_token.to_a)
-    expr = parser.parse
+    exprs = parser.parse
 
-    refute_nil expr
-    T.must(expr).accept visitor
+    assert_equal 1, exprs.size
+    T.must(exprs[0]).accept visitor
     assert_equal '(group (+ 1.0 2.0))', string_io.string
   end
 end

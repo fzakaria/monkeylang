@@ -103,4 +103,23 @@ module MonkeyLang
       visitor.visit_literal_expression(self)
     end
   end
+
+  # Expression for printing
+  # TODO: Move this to a function in standard library later
+  class PrintExpression < Expression
+    extend T::Sig
+
+    sig { returns(Expression) }
+    attr_reader :expression
+
+    sig { params(expression: Expression).void }
+    def initialize(expression)
+      @expression = expression
+    end
+
+    sig { override.type_parameters(:T).params(visitor: Visitor[T.type_parameter(:T)]).void }
+    def accept(visitor)
+      visitor.visit_print_expression(self)
+    end
+  end
 end

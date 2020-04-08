@@ -40,6 +40,11 @@ module MonkeyLang
         @io.print literal
       end
 
+      sig { override.params(expr: PrintExpression).void }
+      def visit_print_expression(expr)
+        paranethesis('print', expr.expression)
+      end
+
       sig { params(name: String, exprs: Expression).void }
       private def paranethesis(name, *exprs)
         @io.print "(#{name}"

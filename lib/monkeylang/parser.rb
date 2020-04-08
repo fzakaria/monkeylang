@@ -4,6 +4,7 @@
 require 'sorbet-runtime'
 require 'active_support/core_ext/object'
 
+require_relative 'keyword'
 require_relative 'token'
 require_relative 'expression'
 module MonkeyLang
@@ -29,11 +30,15 @@ module MonkeyLang
       @position = T.let(0, Integer)
     end
 
-    sig { void }
-    def parse; end
+    sig { returns(T.nilable(Expression)) }
+    def parse
+      expression
+    rescue StandardError
+      nil
+    end
 
     # expression -> equality ;
-    sig { void }
+    sig { returns(Expression) }
     private def expression
       equality
     end
@@ -41,33 +46,105 @@ module MonkeyLang
     # equality -> comparison ( ( "!=" | "==" ) comparison )* ;
     sig { returns(Expression) }
     private def equality
-      left_associate_operators([TokenType::BangEqual, TokenType::EqualEqual])
-    end
+      expr = comparison
 
-    # comparison -> addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
-    sig { returns(Expression) }
-    private def comparison
-      left_associate_operators([TokenType::GreaterThan, TokenType::GreaterThanOrEqual,
-                                TokenType::LessThan, TokenType::LessThanOrEqual])
-    end
-
-    # addition   -> multiplication ( ( "-" | "+" ) multiplication )* ;
-    sig { returns(Expression) }
-    private def addition
-      left_associate_operators([TokenType::Minus, TokenType::Plus])
-    end
-
-    sig { params(types: T::Array[TokenType]).returns(Expression) }
-    private def left_associate_operators(types)
-      expr = addition
-
-      while match(types)
+      while match([TokenType::BangEqual, TokenType::EqualEqual])
         operator = previous
         right = comparison
         expr = BinaryExpression.new(expr, operator, right)
       end
 
       expr
+    end
+
+    # comparison -> addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
+    sig { returns(Expression) }
+    private def comparison
+      expr = addition
+
+      while match([TokenType::GreaterThan, TokenType::GreaterThanOrEqual,
+                   TokenType::LessThan, TokenType::LessThanOrEqual])
+        operator = previous
+        right = addition
+        expr = BinaryExpression.new(expr, operator, right)
+      end
+
+      expr
+    end
+
+    # addition   -> multiplication ( ( "-" | "+" ) multiplication )* ;
+    sig { returns(Expression) }
+    private def addition
+      expr = multiplication
+
+      while match([TokenType::Minus, TokenType::Plus])
+        operator = previous
+        right = multiplication
+        expr = BinaryExpression.new(expr, operator, right)
+      end
+
+      expr
+    end
+
+    # multiplication -> unary ( ( "/" | "*" ) unary )* ;
+    sig { returns(Expression) }
+    private def multiplication
+      expr = unary
+
+      while match([TokenType::ForwardSlash, TokenType::Asterisk])
+        operator = previous
+        right = unary
+        expr = BinaryExpression.new(expr, operator, right)
+      end
+
+      expr
+    end
+
+    # unary  -> ( "!" | "-" ) unary  | primary ;
+    sig { returns(Expression) }
+    private def unary
+      if match([TokenType::Bang, TokenType::Minus])
+        operator = previous
+        right = unary
+        return UnaryExpression.new(operator, right)
+      end
+
+      primary
+    end
+
+    # primary    -> NUMBER | STRING | "false" | "true" | "nil"
+    #                | "(" expression ")" ;
+    sig { returns(Expression) }
+    private def primary
+      return LiteralExpression.new false if match([TokenType::False])
+      return LiteralExpression.new true if match([TokenType::True])
+      return LiteralExpression.new nil if match([TokenType::Nil])
+      return LiteralExpression.new previous.literal if match([TokenType::String])
+      return LiteralExpression.new previous.literal.to_f if match([TokenType::Number])
+
+      if match([TokenType::LeftParanthesis])
+        expr = expression
+        consume(TokenType::RightParanthesis, "Expect ')' after expression")
+        GroupingExpression.new expr
+      end
+
+      raise error(peek, 'Expected at NUMBER | STRING | "false" | "true" | "nil" | "(" expression ")"')
+    end
+
+    # This is called after an error is caught;
+    # we want to read tokens until the next statement
+    sig { void }
+    private def syncrhonize
+      advance
+      until end?
+        return if previous.type == TokenType::SemiColon
+
+        # if it's a keyword; likely the start of the next statement
+        # lets syncrhonize there
+        return if KEYWORDS.value? peek.type
+
+        advance
+      end
     end
 
     sig { params(types: T::Array[TokenType]).returns(T::Boolean) }
@@ -89,6 +166,20 @@ module MonkeyLang
       @position += 1 unless end?
 
       previous
+    end
+
+    sig { params(type: TokenType, message: String).returns(Token) }
+    private def consume(type, message)
+      return advance if check(type)
+
+      raise error(peek, message)
+    end
+
+    sig { params(token: Token, message: String).returns(RuntimeError) }
+    private def error(token, message)
+      $stdout.puts "#{token}: #{message}" if token.type == TokenType::EOF
+
+      RuntimeError.new message
     end
 
     sig { returns(T::Boolean) }

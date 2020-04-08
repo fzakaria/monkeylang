@@ -88,10 +88,12 @@ module MonkeyLang
   class LiteralExpression < Expression
     extend T::Sig
 
-    sig { returns(String) }
+    Literal = T.type_alias { T.nilable(T.any(String, Integer, Float, String, T::Boolean)) }
+
+    sig { returns(Literal) }
     attr_reader :literal
 
-    sig { params(literal: String).void }
+    sig { params(literal: Literal).void }
     def initialize(literal)
       @literal = literal
     end

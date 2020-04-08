@@ -125,7 +125,7 @@ module MonkeyLang
       if match([TokenType::LeftParanthesis])
         expr = expression
         consume(TokenType::RightParanthesis, "Expect ')' after expression")
-        GroupingExpression.new expr
+        return GroupingExpression.new expr
       end
 
       raise error(peek, 'Expected at NUMBER | STRING | "false" | "true" | "nil" | "(" expression ")"')

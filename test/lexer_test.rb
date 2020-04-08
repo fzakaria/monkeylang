@@ -6,7 +6,7 @@ require 'monkeylang/lexer'
 
 Type = MonkeyLang::TokenType
 
-class LexterTest < Minitest::Test
+class LexerTest < Minitest::Test
   def test_next_token_simple
     input = <<~MONKEYLANG
       # This is a comment
@@ -141,12 +141,12 @@ class LexterTest < Minitest::Test
       (1 + 2)
     MONKEYLANG
     expected_tokens = [
-        token('(', Type::LeftParanthesis),
-        token('1', Type::Number),
-        token('+', Type::Plus),
-        token('2', Type::Number),
-        token(')', Type::RightParanthesis),
-        token('', Type::EOF)
+      token('(', Type::LeftParanthesis),
+      token('1', Type::Number),
+      token('+', Type::Plus),
+      token('2', Type::Number),
+      token(')', Type::RightParanthesis),
+      token('', Type::EOF)
     ]
     lexer = MonkeyLang::Lexer.new(input)
     expected_tokens.each do |expected_token|
@@ -155,7 +155,6 @@ class LexterTest < Minitest::Test
       assert_equal expected_token.literal, token.literal
     end
   end
-
 
   private def token(literal, type)
     MonkeyLang::Token.new(literal: literal, type: type, line_number: 0, column: 0)

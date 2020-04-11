@@ -59,7 +59,6 @@ module MonkeyLang
       return let_expression if match([TokenType::Let])
 
       expr = assignment
-      consume(TokenType::SemiColon, 'Expected a semi colon between expressions.')
 
       expr
     end
@@ -94,11 +93,9 @@ module MonkeyLang
       # We can define a variable without an equality;
       # this is the same as defining the default value
       value = nil
-      if match([TokenType::Equal])
-        value = expression
-      else
-        consume(TokenType::SemiColon, 'Expected a semi colon after a let expression.')
-      end
+      value = expression if match([TokenType::Equal])
+
+      consume(TokenType::SemiColon, 'Expected a semi colon after a let expression.')
 
       LetExpression.new identifier.literal, value
     end
@@ -106,6 +103,7 @@ module MonkeyLang
     sig { returns(PrintExpression) }
     private def print_expression
       expr = expression
+      consume(TokenType::SemiColon, 'Expected a semi colon after a let expression.')
       PrintExpression.new expr
     end
 

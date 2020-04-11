@@ -31,10 +31,9 @@ module MonkeyLang
       # make sure slop options aren't consumed by ARGF
       ARGV.replace opts.arguments
 
+      interpreter = Visitor::Interpreter.new
       # if no argument is supplied; start an interactive REPL
       if ARGV.empty?
-
-        interpreter = Visitor::Interpreter.new
         while (buf = Readline.readline('> ', true))
           break if buf == 'exit'
 
@@ -52,7 +51,8 @@ module MonkeyLang
       ARGV.each do |file|
         contents = File.read(file)
         tokens = lexer(contents, print_tokens: opts.lexer?)
-        parse(tokens, print_ast: opts.ast?)
+        exprs = parse(tokens, print_ast: opts.ast?)
+        interpreter.interpret(exprs)
       end
     end
 

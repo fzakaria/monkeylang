@@ -166,6 +166,50 @@ module MonkeyLang
     end
   end
 
+  # Expression for a block
+  class BlockExpression < Expression
+    extend T::Sig
+
+    sig { returns(T::Array[Expression]) }
+    attr_reader :expressions
+
+    sig { params(expressions: T::Array[Expression]).void }
+    def initialize(expressions)
+      @expressions = expressions
+    end
+
+    sig { override.type_parameters(:T).params(visitor: Visitor[T.type_parameter(:T)]).void }
+    def accept(visitor)
+      visitor.visit_block_expression(self)
+    end
+  end
+
+  # Expression for an if statement
+  class IfExpression < Expression
+    extend T::Sig
+
+    sig { returns(Expression) }
+    attr_reader :condition
+
+    sig { returns(Expression) }
+    attr_reader :then_expr
+
+    sig { returns(T.nilable(Expression)) }
+    attr_reader :else_expr
+
+    sig { params(condition: Expression, then_expr: Expression, else_expr: T.nilable(Expression)).void }
+    def initialize(condition, then_expr, else_expr)
+      @condition = condition
+      @then_expr = then_expr
+      @else_expr = else_expr
+    end
+
+    sig { override.type_parameters(:T).params(visitor: Visitor[T.type_parameter(:T)]).void }
+    def accept(visitor)
+      visitor.visit_if_expression(self)
+    end
+  end
+
   # Expression for printing
   # TODO: Move this to a function in standard library later
   class PrintExpression < Expression

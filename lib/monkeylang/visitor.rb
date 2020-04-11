@@ -33,6 +33,12 @@ module MonkeyLang
     sig { abstract.params(expr: AssignmentExpression).void }
     def visit_assignment_expression(expr); end
 
+    sig { abstract.params(expr: BlockExpression).void }
+    def visit_block_expression(expr); end
+
+    sig { abstract.params(expr: IfExpression).void }
+    def visit_if_expression(expr); end
+
     sig { abstract.params(expr: PrintExpression).void }
     def visit_print_expression(expr); end
   end

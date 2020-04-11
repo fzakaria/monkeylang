@@ -20,17 +20,17 @@ module MonkeyLang
 
       sig { override.params(expr: BinaryExpression).void }
       def visit_binary_expression(expr)
-        paranethesis(expr.operator.literal, expr.left, expr.right)
+        paranethesis(expr.operator.literal, [expr.left, expr.right])
       end
 
       sig { override.params(expr: UnaryExpression).void }
       def visit_unary_expression(expr)
-        paranethesis(expr.operator.literal, expr.right)
+        paranethesis(expr.operator.literal, [expr.right])
       end
 
       sig { override.params(expr: GroupingExpression).void }
       def visit_group_expression(expr)
-        paranethesis('group', expr.expression)
+        paranethesis('group', [expr.expression])
       end
 
       sig { override.params(expr: LiteralExpression).void }
@@ -42,7 +42,7 @@ module MonkeyLang
 
       sig { override.params(expr: LetExpression).void }
       def visit_let_expression(expr)
-        paranethesis("let #{expr.identifier}", T.must(expr.value)) if expr.value.present?
+        paranethesis("let #{expr.identifier}", [T.must(expr.value)]) if expr.value.present?
         paranethesis("let #{expr.identifier}") if expr.value.nil?
       end
 
@@ -51,19 +51,35 @@ module MonkeyLang
         paranethesis(expr.identifier)
       end
 
+      sig { override.params(expr: BlockExpression).void }
+      def visit_block_expression(expr)
+        paranethesis('block', expr.expressions)
+      end
+
+      sig { override.params(expr: IfExpression).void }
+      def visit_if_expression(expr)
+        @io.print '(if '
+        expr.condition.accept(self)
+        @io.print ' then '
+        expr.then_expr.accept(self)
+        @io.print ' else '
+        T.must(expr.else_expr).accept(self) if expr.else_expr.present?
+        @io.print ')'
+      end
+
       sig { override.params(expr: AssignmentExpression).void }
       def visit_assignment_expression(expr)
-        paranethesis(expr.identifier.to_s, T.must(expr.value)) if expr.value.present?
+        paranethesis(expr.identifier.to_s, [T.must(expr.value)]) if expr.value.present?
         paranethesis(expr.identifier.to_s) if expr.value.nil?
       end
 
       sig { override.params(expr: PrintExpression).void }
       def visit_print_expression(expr)
-        paranethesis('print', expr.expression)
+        paranethesis('print', [expr.expression])
       end
 
-      sig { params(name: String, exprs: Expression).void }
-      private def paranethesis(name, *exprs)
+      sig { params(name: String, exprs: T::Array[Expression]).void }
+      private def paranethesis(name, exprs = [])
         @io.print "(#{name}"
         exprs.each do |expr|
           @io.print ' '

@@ -107,10 +107,37 @@ module MonkeyLang
         @result = value
       end
 
+      sig { override.params(expr: BlockExpression).void }
+      def visit_block_expression(expr)
+        execute_block expr.expressions
+      end
+
       sig { override.params(expr: PrintExpression).void }
       def visit_print_expression(expr)
         puts evaluate(expr.expression)
         @result = nil
+      end
+
+      sig { params(expressions: T::Array[Expression]).void }
+      private def execute_block(expressions)
+        # first thing we do is push a scope
+        @environment.push_scope
+        begin
+          expressions.each do |expression|
+            @result = evaluate(expression)
+          end
+        ensure
+          @environment.pop_scope
+        end
+      end
+
+      sig { override.params(expr: IfExpression).void }
+      def visit_if_expression(expr)
+        if true? evaluate(expr.condition)
+          evaluate(expr.then_expr)
+        elsif expr.else_expr.present?
+          evaluate(T.must(expr.else_expr))
+        end
       end
 
       sig { params(expr: Expression).returns(T.untyped) }

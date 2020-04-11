@@ -34,16 +34,10 @@ module MonkeyLang
     def parse
       expressions = []
       begin
-        until end?
-          expressions << expression
-
-          # if we are not at the end; we expect a new line or a semi colon
-          unless end?
-            raise error(peek, 'Expected at SEMI_COLON between expressions') unless match([TokenType::SemiColon])
-          end
-        end
+        expressions << expression until end?
         expressions
-      rescue StandardError
+      rescue StandardError => e
+        puts "Encountered error: #{e.message}"
         # synchronize moves us to the next expression
         # by munging all tokens until the semi-colon
         # This is a friendly way to continue parsing
@@ -58,11 +52,39 @@ module MonkeyLang
     # expression -> equality ;
     sig { returns(Expression) }
     private def expression
+      return if_expression if match([TokenType::If])
       return print_expression if match([TokenType::Print])
+      return block_expression if match([TokenType::LeftCurlyBrace])
 
       return let_expression if match([TokenType::Let])
 
-      assignment
+      expr = assignment
+      consume(TokenType::SemiColon, 'Expected a semi colon between expressions.')
+
+      expr
+    end
+
+    sig { returns(IfExpression) }
+    private def if_expression
+      consume(TokenType::LeftParanthesis, "Expect '(' after 'if'.")
+      condition = assignment
+      consume(TokenType::RightParanthesis, "Expect ')' after 'if'.")
+
+      then_expr = expression
+      else_expr = nil
+      else_expr = expression if match([TokenType::Else])
+
+      IfExpression.new(condition, then_expr, else_expr)
+    end
+
+    sig { returns(BlockExpression) }
+    private def block_expression
+      expressions = []
+
+      expressions << expression until check(TokenType::RightCurlyBrace) || end?
+
+      consume(TokenType::RightCurlyBrace, "Expected '}' at the end of the block.")
+      BlockExpression.new expressions
     end
 
     sig { returns(LetExpression) }
@@ -72,7 +94,11 @@ module MonkeyLang
       # We can define a variable without an equality;
       # this is the same as defining the default value
       value = nil
-      value = expression if match([TokenType::Equal])
+      if match([TokenType::Equal])
+        value = expression
+      else
+        consume(TokenType::SemiColon, 'Expected a semi colon after a let expression.')
+      end
 
       LetExpression.new identifier.literal, value
     end

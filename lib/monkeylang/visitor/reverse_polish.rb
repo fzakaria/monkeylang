@@ -57,6 +57,20 @@ module MonkeyLang
         @io.print expr.identifier
       end
 
+      sig { override.params(expr: BlockExpression).void }
+      def visit_block_expression(expr)
+        expr.expressions.each do |e|
+          e.accept(self)
+        end
+      end
+
+      sig { override.params(expr: IfExpression).void }
+      def visit_if_expression(expr)
+        expr.condition.accept(self)
+        expr.then_expr.accept(self)
+        T.must(expr.else_expr).accept(self) if expr.else_expr.present?
+      end
+
       sig { override.params(expr: AssignmentExpression).void }
       def visit_assignment_expression(expr)
         T.must(expr.value).accept(self) if expr.value.present?

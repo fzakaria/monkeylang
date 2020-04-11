@@ -12,6 +12,11 @@ module MonkeyLang
   # The goal of a parser is to turn a list of tokens
   # into an abstract syntax tree
   #
+  # statement -> exprStmt
+  #           | ifStmt
+  #           | printStmt
+  #           | whileStmt
+  #           | block ;
   # expression -> assignment ;
   # assignment ->  identifier "=" assignment
   #            | logic_or ;
@@ -59,12 +64,23 @@ module MonkeyLang
       return if_expression if match([TokenType::If])
       return print_expression if match([TokenType::Print])
       return block_expression if match([TokenType::LeftCurlyBrace])
-
+      return while_expression if match([TokenType::While])
       return let_expression if match([TokenType::Let])
 
       expr = assignment
 
       expr
+    end
+
+    sig { returns(WhileExpression) }
+    private def while_expression
+      consume(TokenType::LeftParanthesis, "Expect '(' after 'if'.")
+      condition = assignment
+      consume(TokenType::RightParanthesis, "Expect ')' after 'if'.")
+
+      body = expression
+
+      WhileExpression.new(condition, body)
     end
 
     sig { returns(IfExpression) }
@@ -127,6 +143,8 @@ module MonkeyLang
         # at this point, the original expr must be an identifier (VariableExpression)
         if expr.is_a? VariableExpression
           identifier = expr.identifier
+
+          consume(TokenType::SemiColon, 'Expected a semi colon after a let expression.')
           return AssignmentExpression.new identifier, value
         end
         error(equals, 'Invalid asssignment target.')

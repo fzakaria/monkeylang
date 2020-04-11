@@ -42,6 +42,9 @@ module MonkeyLang
     sig { abstract.params(expr: LogicalExpression).void }
     def visit_logical_expression(expr); end
 
+    sig { abstract.params(expr: WhileExpression).void }
+    def visit_while_expression(expr); end
+
     sig { abstract.params(expr: PrintExpression).void }
     def visit_print_expression(expr); end
   end

@@ -52,7 +52,7 @@ module MonkeyLang
         contents = File.read(file)
         tokens = lexer(contents, print_tokens: opts.lexer?)
         exprs = parse(tokens, print_ast: opts.ast?)
-        interpreter.interpret(exprs)
+        puts interpreter.interpret(exprs)
       end
     end
 

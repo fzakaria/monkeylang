@@ -42,7 +42,11 @@ module MonkeyLang
         when TokenType::Minus
           @result = left - right
         when TokenType::Plus
-          @result = left + right
+          @result = if left.is_a?(String) || right.is_a?(String)
+                      left.to_s + right.to_s
+                    else
+                      left + right
+                    end
         when TokenType::ForwardSlash
           @result = left / right
         when TokenType::Asterisk
@@ -150,6 +154,11 @@ module MonkeyLang
 
         rhs_evaluate = evaluate(expr.right)
         @result = rhs_evaluate
+      end
+
+      sig { override.params(expr: WhileExpression).void }
+      def visit_while_expression(expr)
+        @result = evaluate(expr.body) while true?(evaluate(expr.condition))
       end
 
       sig { override.params(expr: IfExpression).void }

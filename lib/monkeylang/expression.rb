@@ -236,6 +236,27 @@ module MonkeyLang
     end
   end
 
+  # Expression for a while loop
+  class WhileExpression < Expression
+    extend T::Sig
+
+    sig { returns(Expression) }
+    attr_reader :condition
+
+    sig { returns(Expression) }
+    attr_reader :body
+    sig { params(condition: Expression, body: Expression).void }
+    def initialize(condition, body)
+      @condition = condition
+      @body = body
+    end
+
+    sig { override.type_parameters(:T).params(visitor: Visitor[T.type_parameter(:T)]).void }
+    def accept(visitor)
+      visitor.visit_while_expression(self)
+    end
+  end
+
   # Expression for printing
   # TODO: Move this to a function in standard library later
   class PrintExpression < Expression

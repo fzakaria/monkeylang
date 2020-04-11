@@ -61,6 +61,11 @@ module MonkeyLang
         paranethesis(expr.operator.literal, [expr.left, expr.right])
       end
 
+      sig { override.params(expr: WhileExpression).void }
+      def visit_while_expression(expr)
+        paranethesis('while', [expr.condition, expr.body])
+      end
+
       sig { override.params(expr: IfExpression).void }
       def visit_if_expression(expr)
         @io.print '(if '

@@ -69,6 +69,11 @@ module MonkeyLang
         # TODO
       end
 
+      sig { override.params(expr: WhileExpression).void }
+      def visit_while_expression(expr)
+        # TODO
+      end
+
       sig { override.params(expr: IfExpression).void }
       def visit_if_expression(expr)
         expr.condition.accept(self)

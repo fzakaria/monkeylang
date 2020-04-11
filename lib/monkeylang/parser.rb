@@ -61,6 +61,7 @@ module MonkeyLang
     # expression -> equality ;
     sig { returns(Expression) }
     private def expression
+      return for_expression if match([TokenType::For])
       return if_expression if match([TokenType::If])
       return print_expression if match([TokenType::Print])
       return block_expression if match([TokenType::LeftCurlyBrace])
@@ -70,6 +71,43 @@ module MonkeyLang
       expr = assignment
 
       expr
+    end
+
+    # Lets add for expressions; however we aren't going to add explicit expression nodes
+    # rather we are going to "desugar" the for loop by turning it into a WHILE loop!
+    sig { returns(Expression) }
+    private def for_expression
+      consume(TokenType::LeftParanthesis, "Expect '(' after 'if'.")
+
+      initializer = nil
+      if match([TokenType::SemiColon])
+        initializer = nil
+      elsif match([TokenType::Let])
+        initializer = let_expression
+      else
+        initializer = assignment
+        consume(TokenType::SemiColon, 'Expected a semi colon after a let expression.')
+      end
+
+      condition = nil
+      condition = assignment unless check(TokenType::SemiColon)
+      consume(TokenType::SemiColon, 'Expected a semi colon after a let expression.')
+
+      increment = nil
+      increment = assignment unless check(TokenType::RightParanthesis)
+      consume(TokenType::RightParanthesis, 'Expected a semi colon after a let expression.')
+
+      body = expression
+
+      body = BlockExpression.new [body, increment] if increment.present?
+
+      condition = LiteralExpression.new true if condition.nil?
+
+      body = WhileExpression.new condition, body
+
+      body = BlockExpression.new [initializer, body] if initializer.present?
+
+      body
     end
 
     sig { returns(WhileExpression) }
@@ -144,7 +182,9 @@ module MonkeyLang
         if expr.is_a? VariableExpression
           identifier = expr.identifier
 
-          consume(TokenType::SemiColon, 'Expected a semi colon after a let expression.')
+          if match([TokenType::SemiColon])
+            consume(TokenType::SemiColon, 'Expected a semi colon after an assignment expression.')
+          end
           return AssignmentExpression.new identifier, value
         end
         error(equals, 'Invalid asssignment target.')

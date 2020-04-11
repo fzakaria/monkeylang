@@ -131,12 +131,33 @@ module MonkeyLang
         end
       end
 
+      sig { override.params(expr: LogicalExpression).void }
+      def visit_logical_expression(expr)
+        left = evaluate(expr.left)
+        if expr.operator.type == TokenType::Or
+          if true?(left)
+            @result = left
+            return
+          end
+        elsif expr.operator.type == TokenType::And
+          unless true?(left)
+            @result = left
+            return
+          end
+        else
+          puts "Unknown logical oeprator: #{expr.operator}"
+        end
+
+        rhs_evaluate = evaluate(expr.right)
+        @result = rhs_evaluate
+      end
+
       sig { override.params(expr: IfExpression).void }
       def visit_if_expression(expr)
         if true? evaluate(expr.condition)
-          evaluate(expr.then_expr)
+          @result = evaluate(expr.then_expr)
         elsif expr.else_expr.present?
-          evaluate(T.must(expr.else_expr))
+          @result = evaluate(T.must(expr.else_expr))
         end
       end
 

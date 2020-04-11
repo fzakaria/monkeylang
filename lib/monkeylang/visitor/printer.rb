@@ -56,6 +56,11 @@ module MonkeyLang
         paranethesis('block', expr.expressions)
       end
 
+      sig { override.params(expr: LogicalExpression).void }
+      def visit_logical_expression(expr)
+        paranethesis(expr.operator.literal, [expr.left, expr.right])
+      end
+
       sig { override.params(expr: IfExpression).void }
       def visit_if_expression(expr)
         @io.print '(if '

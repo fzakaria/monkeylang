@@ -64,6 +64,11 @@ module MonkeyLang
         end
       end
 
+      sig { override.params(expr: LogicalExpression).void }
+      def visit_logical_expression(expr)
+        # TODO
+      end
+
       sig { override.params(expr: IfExpression).void }
       def visit_if_expression(expr)
         expr.condition.accept(self)

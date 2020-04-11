@@ -12,7 +12,11 @@ module MonkeyLang
   # The goal of a parser is to turn a list of tokens
   # into an abstract syntax tree
   #
-  # expression -> equality ;
+  # expression -> assignment ;
+  # assignment ->  identifier "=" assignment
+  #            | logic_or ;
+  # logic_or   ->  logic_and ( "or" logic_and )* ;
+  # logic_and  ->  equality ( "and" equality )* ;
   # equality   -> comparison ( ( "!=" | "==" ) comparison )* ;
   # comparison -> addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
   # addition   -> multiplication ( ( "-" | "+" ) multiplication )* ;
@@ -109,7 +113,7 @@ module MonkeyLang
 
     sig { returns(Expression) }
     private def assignment
-      expr = equality
+      expr = or_expression
 
       if match([TokenType::Equal])
         equals = previous
@@ -126,6 +130,32 @@ module MonkeyLang
           return AssignmentExpression.new identifier, value
         end
         error(equals, 'Invalid asssignment target.')
+      end
+
+      expr
+    end
+
+    sig { returns(Expression) }
+    private def or_expression
+      expr = and_expression
+
+      while match([TokenType::Or])
+        operator = previous
+        right = and_expression
+        expr = LogicalExpression.new(expr, operator, right)
+      end
+
+      expr
+    end
+
+    sig { returns(Expression) }
+    private def and_expression
+      expr = equality
+
+      while match([TokenType::And])
+        operator = previous
+        right = equality
+        expr = LogicalExpression.new(expr, operator, right)
       end
 
       expr

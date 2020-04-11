@@ -210,6 +210,32 @@ module MonkeyLang
     end
   end
 
+  # Expression for an and/or expression
+  class LogicalExpression < Expression
+    extend T::Sig
+
+    sig { returns(Expression) }
+    attr_reader :left
+
+    sig { returns(Token) }
+    attr_reader :operator
+
+    sig { returns(Expression) }
+    attr_reader :right
+
+    sig { params(left: Expression, operator: Token, right: Expression).void }
+    def initialize(left, operator, right)
+      @left = left
+      @operator = operator
+      @right = right
+    end
+
+    sig { override.type_parameters(:T).params(visitor: Visitor[T.type_parameter(:T)]).void }
+    def accept(visitor)
+      visitor.visit_logical_expression(self)
+    end
+  end
+
   # Expression for printing
   # TODO: Move this to a function in standard library later
   class PrintExpression < Expression

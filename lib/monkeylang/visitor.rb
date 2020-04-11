@@ -39,6 +39,9 @@ module MonkeyLang
     sig { abstract.params(expr: IfExpression).void }
     def visit_if_expression(expr); end
 
+    sig { abstract.params(expr: LogicalExpression).void }
+    def visit_logical_expression(expr); end
+
     sig { abstract.params(expr: PrintExpression).void }
     def visit_print_expression(expr); end
   end

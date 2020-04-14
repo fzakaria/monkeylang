@@ -8,12 +8,17 @@ module MonkeyLang
   class Environment
     extend T::Sig
 
-    sig { void }
-    def initialize
+    sig { params(scope: Scope).void }
+    def initialize(scope = Scope.new)
       @scopes = T.let([], T::Array[Scope])
 
       # there is always the global scope
-      @scopes << Scope.new
+      @scopes << scope
+    end
+
+    sig { returns(Scope) }
+    def global_scope
+      T.must(@scopes.first)
     end
 
     sig { void }

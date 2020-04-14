@@ -166,6 +166,28 @@ module MonkeyLang
     end
   end
 
+  # Expression for a return
+  class ReturnExpression < Expression
+    extend T::Sig
+
+    sig { returns(Token) }
+    attr_reader :keyword
+
+    sig { returns(Expression) }
+    attr_reader :value
+
+    sig { params(keyword: Token, value: Expression).void }
+    def initialize(keyword, value)
+      @keyword = keyword
+      @value = value
+    end
+
+    sig { override.type_parameters(:T).params(visitor: Visitor[T.type_parameter(:T)]).void }
+    def accept(visitor)
+      visitor.visit_return_expression(self)
+    end
+  end
+
   # Expression for a block
   class BlockExpression < Expression
     extend T::Sig
@@ -181,6 +203,58 @@ module MonkeyLang
     sig { override.type_parameters(:T).params(visitor: Visitor[T.type_parameter(:T)]).void }
     def accept(visitor)
       visitor.visit_block_expression(self)
+    end
+  end
+
+  # Expression for a call
+  class CallExpression < Expression
+    extend T::Sig
+
+    sig { returns(Expression) }
+    attr_reader :callee
+
+    sig { returns(Token) }
+    attr_reader :paren
+
+    sig { returns(T::Array[Expression]) }
+    attr_reader :arguments
+
+    sig { params(callee: Expression, paren: Token, arguments: T::Array[Expression]).void }
+    def initialize(callee, paren, arguments)
+      @callee = callee
+      @paren = paren
+      @arguments = arguments
+    end
+
+    sig { override.type_parameters(:T).params(visitor: Visitor[T.type_parameter(:T)]).void }
+    def accept(visitor)
+      visitor.visit_call_expression(self)
+    end
+  end
+
+  # Expression for creating functions
+  class FunctionExpression < Expression
+    extend T::Sig
+
+    sig { returns(Token) }
+    attr_reader :name
+
+    sig { returns(T::Array[Token]) }
+    attr_reader :params
+
+    sig { returns(BlockExpression) }
+    attr_reader :body
+
+    sig { params(name: Token, params: T::Array[Token], body: BlockExpression).void }
+    def initialize(name, params, body)
+      @name = name
+      @params = params
+      @body = body
+    end
+
+    sig { override.type_parameters(:T).params(visitor: Visitor[T.type_parameter(:T)]).void }
+    def accept(visitor)
+      visitor.visit_function_expression(self)
     end
   end
 

@@ -66,6 +66,21 @@ module MonkeyLang
         paranethesis('while', [expr.condition, expr.body])
       end
 
+      sig { override.params(expr: CallExpression).void }
+      def visit_call_expression(expr)
+        # TODO
+      end
+
+      sig { override.params(expr: FunctionExpression).void }
+      def visit_function_expression(expr)
+        # TODO
+      end
+
+      sig { override.params(expr: ReturnExpression).void }
+      def visit_return_expression(expr)
+        # TODO
+      end
+
       sig { override.params(expr: IfExpression).void }
       def visit_if_expression(expr)
         @io.print '(if '

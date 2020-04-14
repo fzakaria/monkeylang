@@ -4,6 +4,7 @@
 require 'sorbet-runtime'
 require_relative '../visitor'
 require_relative '../environment'
+require_relative '../callable'
 
 module MonkeyLang
   module Visitor
@@ -15,15 +16,19 @@ module MonkeyLang
       include Visitor
 
       sig { returns(T.nilable(Object)) }
-      attr_reader :result
+      attr_accessor :result
 
       sig { returns(Environment) }
-      attr_reader :environment
+      attr_accessor :environment
 
       sig { void }
       def initialize
         @result = T.let(nil, T.untyped)
         @environment = T.let(Environment.new, Environment)
+
+        ## Initialize some native functions here!
+        # https://craftinginterpreters.com/functions.html
+        @environment.define('clock', Callable::NativeCallable.new('native-clock-fn', -> { Time.now.to_f }))
       end
 
       sig { params(expressions: T::Array[Expression]).returns(T.untyped) }
@@ -113,7 +118,7 @@ module MonkeyLang
 
       sig { override.params(expr: BlockExpression).void }
       def visit_block_expression(expr)
-        execute_block expr.expressions
+        Interpreter.execute_block expr.expressions, self, @environment
       end
 
       sig { override.params(expr: PrintExpression).void }
@@ -122,17 +127,34 @@ module MonkeyLang
         @result = nil
       end
 
-      sig { params(expressions: T::Array[Expression]).void }
-      private def execute_block(expressions)
+      sig { params(expressions: T::Array[Expression], interpreter: Interpreter, environment: Environment).void }
+      def self.execute_block(expressions, interpreter, environment)
+        previous_environment = interpreter.environment
+        interpreter.environment = environment
+
         # first thing we do is push a scope
-        @environment.push_scope
+        environment.push_scope
         begin
           expressions.each do |expression|
-            @result = evaluate(expression)
+            interpreter.result = interpreter.evaluate(expression)
           end
         ensure
-          @environment.pop_scope
+          environment.pop_scope
+
+          interpreter.environment = previous_environment
         end
+      end
+
+      sig { override.params(expr: ReturnExpression).void }
+      def visit_return_expression(expr)
+        # TODO
+      end
+
+      sig { override.params(expr: FunctionExpression).void }
+      def visit_function_expression(expr)
+        function = MonkeyLang::Callable::FunctionCallable.new expr
+        environment.define(expr.name.literal, function)
+        @result = nil
       end
 
       sig { override.params(expr: LogicalExpression).void }
@@ -170,8 +192,22 @@ module MonkeyLang
         end
       end
 
+      sig { override.params(expr: CallExpression).void }
+      def visit_call_expression(expr)
+        callee = evaluate(expr.callee)
+
+        raise 'Can only call on functions or classes' unless callee.is_a?(Callable)
+
+        arguments = expr.arguments.map { |arg| evaluate(arg) }
+
+        function = callee
+        raise 'Incorrect number of arguments' unless arguments.size == function.arity
+
+        @result = function.call(self, arguments)
+      end
+
       sig { params(expr: Expression).returns(T.untyped) }
-      private def evaluate(expr)
+      def evaluate(expr)
         expr.accept(self)
         result
       end

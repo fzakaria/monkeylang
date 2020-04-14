@@ -11,7 +11,9 @@ module MonkeyLang
   # The Parser for the Monkey language.
   # The goal of a parser is to turn a list of tokens
   # into an abstract syntax tree
-  #
+  # declaration -> funDecl
+  #             | varDecl
+  #             | statement ;
   # statement -> exprStmt
   #           | ifStmt
   #           | printStmt
@@ -61,6 +63,7 @@ module MonkeyLang
     # expression -> equality ;
     sig { returns(Expression) }
     private def expression
+      return function if match([TokenType::Function])
       return for_expression if match([TokenType::For])
       return if_expression if match([TokenType::If])
       return print_expression if match([TokenType::Print])
@@ -71,6 +74,26 @@ module MonkeyLang
       expr = assignment
 
       expr
+    end
+
+    sig { returns(FunctionExpression) }
+    private def function
+      name = consume(TokenType::Identifier, 'expected function name.')
+
+      consume(TokenType::LeftParanthesis, "expected '(' after function.")
+      arguments = []
+      unless check(TokenType::RightParanthesis)
+        loop do
+          arguments << consume(TokenType::Identifier, 'Expect parameter name')
+          break unless match([TokenType::Comma])
+        end
+      end
+      consume(TokenType::RightParanthesis, "expected ')' after parameters.")
+
+      consume(TokenType::LeftCurlyBrace, "expected '{' before body.")
+      body = block_expression
+
+      FunctionExpression.new name, arguments, body
     end
 
     # Lets add for expressions; however we aren't going to add explicit expression nodes
@@ -138,7 +161,11 @@ module MonkeyLang
     private def block_expression
       expressions = []
 
-      expressions << expression until check(TokenType::RightCurlyBrace) || end?
+      until check(TokenType::RightCurlyBrace) || end?
+        expressions << expression
+
+        match([TokenType::SemiColon])
+      end
 
       consume(TokenType::RightCurlyBrace, "Expected '}' at the end of the block.")
       BlockExpression.new expressions
@@ -285,7 +312,32 @@ module MonkeyLang
         return UnaryExpression.new(operator, right)
       end
 
-      primary
+      call
+    end
+
+    sig { returns(Expression) }
+    private def call
+      expr = primary
+      loop do
+        expr = finish_call(expr) if match([TokenType::LeftParanthesis])
+        break unless match([TokenType::LeftParanthesis])
+      end
+      expr
+    end
+
+    sig { params(callee: Expression).returns(Expression) }
+    private def finish_call(callee)
+      arguments = []
+      unless check(TokenType::RightParanthesis)
+        loop do
+          arguments << assignment
+          break unless match([TokenType::Comma])
+        end
+      end
+
+      paren = consume(TokenType::RightParanthesis, "Expect ')' after arguments.")
+
+      CallExpression.new(callee, paren, arguments)
     end
 
     # primary    -> NUMBER | STRING | "false" | "true" | "nil"
